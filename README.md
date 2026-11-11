@@ -1,4 +1,4 @@
-# Escucha dicótica · Clínica Barajas · V1.6
+# Escucha dicótica · Clínica Barajas · V1.7
 
 Plantilla web del Test de Dígitos Dicóticos (TDD). Introduce las respuestas de cualquiera de las tres listas y descarga un informe PDF A4 vertical. Incluye el logotipo de Clínica Barajas y referencia bibliográfica.
 
@@ -12,6 +12,8 @@ Plantilla web del Test de Dígitos Dicóticos (TDD). Introduce las respuestas de
 4. Abre o descarga el PDF. Cada lista produce su propio informe; no es necesario realizar las tres.
 5. Pulsa **Nueva evaluación** para eliminar los datos de la sesión. Recargar o cerrar también los elimina.
 
+El botón **Cargar ejemplo** introduce un patrón anónimo de respuestas en las tres listas. No añade nombre, identificador, fecha de nacimiento, lateralidad, examinador ni observaciones, y no calcula los informes automáticamente.
+
 La herramienta puntúa respuestas obtenidas con el material de la prueba. No incluye audio ni administra estímulos.
 
 ## Privacidad
@@ -20,7 +22,7 @@ El cálculo y la generación del PDF se ejecutan íntegramente en el navegador. 
 
 El PDF descargado se conserva en el dispositivo del usuario. El alojamiento GitHub Pages registra datos técnicos de visita, como la IP, según su política; la aplicación no transmite las respuestas ni los datos del participante. Véase [GitHub Pages: recopilación de datos](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages#data-collection).
 
-El repositorio contiene únicamente código, plantillas vacías, valores de referencia publicados y el logo. No contiene evaluaciones, datos individuales de la muestra original ni credenciales.
+El repositorio contiene código, plantillas, valores de referencia publicados, el logo y un patrón anónimo de respuestas de demostración sin identificadores ni metadatos personales. No contiene nombres, números de historia, fechas de nacimiento, observaciones clínicas, datos individuales de la muestra normativa ni credenciales.
 
 ## Cálculo y referencia
 
@@ -43,6 +45,11 @@ Para revisar localmente, sirve esta carpeta con un servidor estático (por ejemp
 Pruebas sin dependencias: `node --test core.test.js` (Node 20 o posterior). Verifican denominadores, independencia de listas, ceros, pares solapados, edad, límites normativos, percentiles, estructura PDF y ausencia de mecanismos de persistencia/envío.
 
 El logotipo pertenece a Clínica Barajas. La referencia bibliográfica se conserva en la web y en cada informe.
+
+## V1.7
+
+- Añadido **Cargar ejemplo** para rellenar las tres listas con respuestas anónimas de demostración.
+- El ejemplo no incorpora datos identificativos, no se calcula automáticamente y puede eliminarse con **Nueva evaluación**.
 
 ## V1.6
 

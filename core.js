@@ -3,6 +3,12 @@ import { clinicalAge_ } from './report.js';
 
 export const MODES = ['Atención dividida','Atención focalizada - oído derecho','Atención focalizada - oído izquierdo'];
 
+const EXAMPLE_BITS = {
+  1:['111111111111101111110011110101111001111001111011111111011111111001111011011011011','101000010011001010110111110111001001011101001001100101100100010110110111101101001'],
+  2:['010111110101110001001111011101111111111111111111111111111110011111110111111111110','100000000000001000000000000010000000000000000000000000000001100000000000000000000'],
+  3:['000001000000001001000000001100000101000100000001010011001010000010000010000000000','111100110111110111001111001010101000011001111010101001110101010101111011110110111']
+};
+
 export function dateFromIso(value) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value || '')) return null;
   const [y,m,d]=value.split('-').map(Number), date=new Date(y,m-1,d,12);
@@ -17,6 +23,14 @@ export function blankSession() {
     participant:{name:'',patient:'',birth:'',exam:today(),hand:'',examiner:'',notes:''},
     lists:Object.fromEntries([1,2,3].map(n=>[n,{mode:MODES[n-1],odDb:'',oiDb:'',complete:false,scores:Array.from({length:81},()=>[false,false])}]))
   };
+}
+export function exampleSession() {
+  const session=blankSession();
+  for(const n of [1,2,3]){
+    const [od,oi]=EXAMPLE_BITS[n];
+    session.lists[n].scores=Array.from({length:81},(_,i)=>[od[i]==='1',oi[i]==='1']);
+  }
+  return session;
 }
 export function calculate(listNumber, list, participant) {
   const def=TEST_LISTS[listNumber];

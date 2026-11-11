@@ -1,5 +1,5 @@
 import { TEST_LISTS } from './data.js';
-import { MODES, blankSession, calculate } from './core.js';
+import { MODES, blankSession, calculate, exampleSession } from './core.js';
 import { buildClinicalPdf_, clinicalNorm_ } from './report.js';
 import { APP_VERSION } from './version.js';
 
@@ -53,6 +53,12 @@ function resetAll(){
   document.querySelectorAll('[data-list] span').forEach((span,i)=>span.textContent=['Atención dividida','Focalizada · OD','Focalizada · OI'][i]);
   fields.forEach(id=>$(id).value=session.participant[id]);renderList();
 }
+function loadExample(){
+  releasePdf();session=exampleSession();active=1;dirty=true;$('evaluationForm').reset();
+  document.querySelectorAll('[data-list] span').forEach((span,i)=>span.textContent=['Atención dividida','Focalizada · OD','Focalizada · OI'][i]);
+  fields.forEach(id=>$(id).value=session.participant[id]);$('exampleDialog').close();renderList();
+  setStatus('Ejemplo anónimo cargado. Revisa las tres listas antes de calcular.');document.querySelector('[data-list="1"]').focus();
+}
 function createPdf(){
   const list=session.lists[active];if(!list.complete)throw new Error('Revisa y calcula la lista antes de descargar el informe.');
   const data=calculate(active,list,session.participant);
@@ -79,6 +85,9 @@ $('acceptConfirm').addEventListener('click',()=>{session.lists[active].complete=
 $('download').addEventListener('click',download);$('dialogDownload').addEventListener('click',download);
 $('preview').addEventListener('click',()=>{try{const {data}=createPdf();$('pdfTitle').textContent='Informe de Lista '+active;$('pdfPreview').innerHTML=buildClinicalPdf_(data,true);$('pdfDialog').showModal()}catch(e){setStatus(e.message,true)}});
 $('closePreview').addEventListener('click',()=>$('pdfDialog').close());
+$('loadExample').addEventListener('click',()=>$('exampleDialog').showModal());
+$('cancelExample').addEventListener('click',()=>$('exampleDialog').close());
+$('acceptExample').addEventListener('click',loadExample);
 $('reset').addEventListener('click',()=>$('resetDialog').showModal());
 $('cancelReset').addEventListener('click',()=>$('resetDialog').close());
 $('acceptReset').addEventListener('click',()=>{$('resetDialog').close();resetAll();$('name').focus()});
