@@ -1,4 +1,4 @@
-# Escucha dicótica · Clínica Barajas · V1.12
+# Escucha dicótica · Clínica Barajas · V1.13
 
 Plantilla web del Test de Dígitos Dicóticos (TDD). Introduce las respuestas de cualquiera de las tres listas y descarga informes PDF A4 verticales. Permite generar cada informe con identidad de Clínica Barajas o en formato neutro, sin logo ni mención institucional.
 
@@ -15,7 +15,7 @@ Plantilla web del Test de Dígitos Dicóticos (TDD). Introduce las respuestas de
 
 El botón **Cargar ejemplo** introduce un caso clínico anonimizado con las respuestas de las tres listas, edad en el TDD, lateralidad e intensidades. En la pantalla principal y en los informes se identifica exclusivamente como **CASO DE EJEMPLO · ANÓNIMO**. Las fechas son sintéticas y solo sirven para calcular la edad. No añade nombre real, identificador, fechas reales, examinador ni observaciones, y no calcula los informes automáticamente.
 
-La herramienta puntúa respuestas obtenidas con el material de la prueba. No incluye audio ni administra estímulos.
+La herramienta puntúa las respuestas del TDD. El apartado de materiales ofrece los audios oficiales para que el profesional administre cada lista y las plantillas A4 para el registro opcional en papel; la aplicación no controla el equipo ni las condiciones clínicas de presentación.
 
 ## Privacidad
 
@@ -23,7 +23,7 @@ El cálculo y la generación del PDF se ejecutan íntegramente en el navegador. 
 
 El PDF descargado se conserva en el dispositivo del usuario. El alojamiento GitHub Pages registra datos técnicos de visita, como la IP, según su política; la aplicación no transmite las respuestas ni los datos del participante. Véase [GitHub Pages: recopilación de datos](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages#data-collection).
 
-El repositorio contiene código, plantillas, valores de referencia publicados, el logo y un caso clínico resumido y anonimizado de demostración. No contiene nombres, números de historia, fechas reales, centro de procedencia, profesionales, datos familiares, datos individuales de la muestra normativa ni credenciales.
+El repositorio contiene código, audios y plantillas oficiales autorizados por AUDITIO EDICIONES, valores de referencia publicados, el logo y un caso clínico resumido y anonimizado de demostración. No contiene nombres, números de historia, fechas reales, centro de procedencia, profesionales, datos familiares, datos individuales de la muestra normativa ni credenciales.
 
 ## Cálculo y referencia
 
@@ -34,6 +34,10 @@ El Informe 04 aplica el índice de cambio `100 × (AF − LB) / (AF + LB)` y pre
 Referencia: Zenker Castro F, Suárez Suárez M, Marro Cosialls S, Barajas de Prat JJ. **La evaluación del procesamiento auditivo central: el test de dígitos dicóticos.** Revista de Logopedia, Foniatría y Audiología. 2007;27(2):74–85. [doi:10.1016/S0214-4603(07)70076-1](https://doi.org/10.1016/S0214-4603(07)70076-1).
 
 Referencia de aplicación clínica: Zenker Castro F, Fernández Belda R, Barajas de Prat JJ. **Test de dígitos dicóticos. Estudio de un caso.** Acta Otorrinolaringológica Española. 2008;59(10):503–505. [doi:10.1016/S0001-6519(08)75521-3](https://doi.org/10.1016/S0001-6519(08)75521-3).
+
+Estudio original de modulación atencional: Gadea M, Espert R. **A comparison of the effects for sustained versus shifted attention on dichotic listening performance.** Laterality. 2009;14(3):315–328. [doi:10.1080/13576500802440707](https://doi.org/10.1080/13576500802440707).
+
+Estudio original del ASI: Asbjørnsen AE, Bryden MP. **Auditory attentional shifts in reading-disabled students: quantification of attentional effectiveness by the Attentional Shift Index.** Neuropsychologia. 1998;36(2):143–148. [doi:10.1016/S0028-3932(97)00090-0](https://doi.org/10.1016/S0028-3932(97)00090-0). El Informe 04 no calcula el ASI ni utiliza sus puntos de corte.
 
 Se utilizan las medias y DT de la tabla 1 para atención dividida, por edad, oído y dificultad. z = (resultado − media) / DT. El percentil estimado es 100 × Φ(z), bajo aproximación normal, redondeado al entero, con extremos <1 y >99. **No son percentiles empíricos, no han sido validados como baremo independiente y no equivalen a un diagnóstico.** La banda representa media ±1 DT, no un punto de corte.
 
@@ -51,6 +55,15 @@ El logotipo pertenece a Clínica Barajas. La referencia bibliográfica se conser
 
 La ilustración de cerebro y oídos del Informe 04 fue aportada expresamente para este proyecto y se integra en el PDF sin conexiones externas.
 
+## V1.13
+
+- Añadido un apartado de materiales oficiales de administración, autorizado por AUDITIO EDICIONES.
+- Descarga independiente de los audios MP3 y las plantillas PDF A4 de las Listas 1, 2 y 3.
+- Las plantillas se presentan como alternativa opcional al registro directo de respuestas en pantalla.
+- Acceso rápido a los materiales desde la cabecera de la evaluación.
+- Sustituida la tesis como referencia del Informe 04 por los artículos originales de Gadea y Espert (2009) y Asbjørnsen y Bryden (1998).
+- Aclarado que el índice simétrico del informe es descriptivo y no equivale al ASI ni utiliza sus puntos de corte.
+
 ## V1.12
 
 - Al cargar el ejemplo, el campo «Nombre o código del participante» muestra **CASO DE EJEMPLO · ANÓNIMO**.
@@ -64,7 +77,7 @@ La ilustración de cerebro y oídos del Informe 04 fue aportada expresamente par
 - Incorporada la ilustración original de cerebro y oídos aportada por el autor, tanto en la vista previa como en el PDF del Informe 04.
 - Añadido al final de la aplicación un manual consultable para interpretar los cuatro informes.
 - Los informes 02 y 03 de atención focalizada se explican en un único bloque, intercambiando oído atendido y competidor.
-- Añadidas secuencias de lectura, ejemplos, límites interpretativos y enlace a la referencia de Gadea Doménech.
+- Añadidas secuencias de lectura, ejemplos y límites interpretativos para los cuatro informes.
 
 ## V1.10
 
