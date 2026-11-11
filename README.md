@@ -1,4 +1,4 @@
-# Escucha dicótica · Clínica Barajas
+# Escucha dicótica · Clínica Barajas · V1.6
 
 Plantilla web del Test de Dígitos Dicóticos (TDD). Introduce las respuestas de cualquiera de las tres listas y descarga un informe PDF A4 vertical. Incluye el logotipo de Clínica Barajas y referencia bibliográfica.
 
@@ -28,6 +28,8 @@ Cada lista contiene 81 dígitos por oído: 18, 27 y 36 en las tres dificultades.
 
 Referencia: Zenker Castro F, Suárez Suárez M, Marro Cosialls S, Barajas de Prat JJ. **La evaluación del procesamiento auditivo central: el test de dígitos dicóticos.** Revista de Logopedia, Foniatría y Audiología. 2007;27(2):74–85. [doi:10.1016/S0214-4603(07)70076-1](https://doi.org/10.1016/S0214-4603(07)70076-1).
 
+Referencia de aplicación clínica: Zenker Castro F, Fernández Belda R, Barajas de Prat JJ. **Test de dígitos dicóticos. Estudio de un caso.** Acta Otorrinolaringológica Española. 2008;59(10):503–505. [doi:10.1016/S0001-6519(08)75521-3](https://doi.org/10.1016/S0001-6519(08)75521-3).
+
 Se utilizan las medias y DT de la tabla 1 para atención dividida, por edad, oído y dificultad. z = (resultado − media) / DT. El percentil estimado es 100 × Φ(z), bajo aproximación normal, redondeado al entero, con extremos <1 y >99. **No son percentiles empíricos, no han sido validados como baremo independiente y no equivalen a un diagnóstico.** La banda representa media ±1 DT, no un punto de corte.
 
 La muestra publicada era diestra y se evaluó a 65 dB nHL. No se aplica esta referencia a atención focalizada ni automáticamente a personas siniestras o ambidiestras. Grupos de la tabla: 6–12, 13–17, 18–34, 35–59 y >60 años. No se extrapola fuera de 6–72 años ni se asigna baremo a los 60 años, límite no definido expresamente en la tabla. No hay percentiles de la media bilateral ni del índice IL.
@@ -41,3 +43,9 @@ Para revisar localmente, sirve esta carpeta con un servidor estático (por ejemp
 Pruebas sin dependencias: `node --test core.test.js` (Node 20 o posterior). Verifican denominadores, independencia de listas, ceros, pares solapados, edad, límites normativos, percentiles, estructura PDF y ausencia de mecanismos de persistencia/envío.
 
 El logotipo pertenece a Clínica Barajas. La referencia bibliográfica se conserva en la web y en cada informe.
+
+## V1.6
+
+- Identificador visible en la web y en cada PDF.
+- OD en rojo (#c62828) y OI en azul (#1565c0), en respuestas, puntuaciones y gráficos. Los elementos de marca conservan el color de la clínica.
+- Incorporada la referencia clínica de 2008. La referencia normativa continúa siendo la tabla 1 de 2007.

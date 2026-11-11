@@ -1,8 +1,10 @@
 import { TEST_LISTS } from './data.js';
 import { MODES, blankSession, calculate } from './core.js';
 import { buildClinicalPdf_, clinicalNorm_ } from './report.js';
+import { APP_VERSION } from './version.js';
 
 const $=id=>document.getElementById(id);
+document.querySelectorAll('[data-version]').forEach(el=>el.textContent=APP_VERSION);
 let session=blankSession(),active=1,pdfUrl=null,dirty=false;
 const fields=['name','patient','birth','exam','hand','examiner','notes'];
 const listFields=['mode','odDb','oiDb'];

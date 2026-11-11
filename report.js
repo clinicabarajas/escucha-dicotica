@@ -1,4 +1,5 @@
 import { PDF_LOGO } from './logo-pdf.js';
+import { APP_VERSION } from './version.js';
 // Referencia descriptiva publicada: Zenker Castro et al., 2007, tabla 1, p. 78.
 // Percentiles estimados bajo distribución normal; no son percentiles empíricos publicados.
 const TDD_NORMS = [
@@ -34,7 +35,7 @@ function clinicalPercentile_(z) {
 
 function buildClinicalPdf_(d, preview=false) {
   const W=595.28,H=841.89,M=34,CW=W-2*M;
-  const ink='#183348',muted='#617789',line='#dce5eb',soft='#f1f6f8',od='#087f8c',oi='#7360a9',white='#ffffff';
+  const ink='#183348',muted='#617789',line='#dce5eb',soft='#f1f6f8',od='#c62828',oi='#1565c0',accent='#087f8c',white='#ffffff';
   const pages=[[]];let out=pages[0];const svg=[];
   const xml=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[c]));
   function vector(s){if(!preview)return;const i=pages.indexOf(out);if(!svg[i])svg[i]=[];svg[i].push(s);}
@@ -53,12 +54,12 @@ function buildClinicalPdf_(d, preview=false) {
   const norm=clinicalNorm_(d),g=norm.group,free=d.mode==='Atención dividida';
   const odLabel=d.mode.includes('oído izquierdo')?'Intrusiones OD':'Aciertos OD';
   const oiLabel=d.mode.includes('oído derecho')?'Intrusiones OI':'Aciertos OI';
-  function footer(page,total){stroke(M,799,W-M,799);text('CLÍNICA BARAJAS',M,815,8,true);text('Lista '+d.list+'  ·  '+(d.date||'Sin fecha')+'  ·  '+page+'/'+total,W-M,815,8,false,muted,'right');}
-  function legend(x,y){dot(x,y-3,3,od);text(odLabel,x+8,y,8);dot(x+108,y-3,3,oi);text(oiLabel,x+116,y,8);}
+  function footer(page,total){stroke(M,799,W-M,799);text('CLÍNICA BARAJAS',M,815,8,true);text('Lista '+d.list+'  ·  '+(d.date||'Sin fecha')+'  ·  '+APP_VERSION+'  ·  '+page+'/'+total,W-M,815,8,false,muted,'right');}
+  function legend(x,y){dot(x,y-3,3,od);text(odLabel,x+8,y,8,false,od);dot(x+108,y-3,3,oi);text(oiLabel,x+116,y,8,false,oi);}
   const logoW=69,logoH=logoW*PDF_LOGO.height/PDF_LOGO.width;vector('<image href="./logo-clinica-barajas.png" x="'+M+'" y="22" width="'+logoW+'" height="'+logoH+'"/>');out.push('q '+num(logoW)+' 0 0 '+num(logoH)+' '+num(M)+' '+num(H-22-logoH)+' cm /Logo Do Q');
   text('INFORME AUDIOLÓGICO',W-M,43,8,true,muted,'right');text('TDD / LISTA '+d.list,W-M,59,11,true,ink,'right');
   text('Escucha dicótica',M+90,84,27,true);text('Test de Dígitos Dicóticos',M+90,105,11,false,muted);
-  rect(M,131,CW,2,od);text(d.mode,M,151,10,true);text(d.completed===100?'EVALUACIÓN COMPLETA':'REGISTRO INCOMPLETO · '+fmt(d.completed,0)+' %',W-M,151,8,true,muted,'right');
+  rect(M,131,CW,2,accent);text(d.mode,M,151,10,true);text(d.completed===100?'EVALUACIÓN COMPLETA':'REGISTRO INCOMPLETO · '+fmt(d.completed,0)+' %',W-M,151,8,true,muted,'right');
   rect(M,162,CW,66,soft);
   text('PARTICIPANTE',M+12,177,7.5,true,muted);let nameSize=12;while(nameSize>8&&wrap(d.name||'Sin identificar',310,nameSize,true).length>2)nameSize--;const nameLines=wrap(d.name||'Sin identificar',310,nameSize,true);nameLines.forEach((s,i)=>text(s,M+12,193+i*13,nameSize,true));
   text('FECHA',W-M-132,177,7.5,true,muted);text(d.date||'No consta',W-M-132,194,11,true);
@@ -66,16 +67,16 @@ function buildClinicalPdf_(d, preview=false) {
   text('Lateralidad: '+(d.hand||'No consta'),W-M-132,218,8.5,false,muted);
   const cards=[['OÍDO DERECHO',odLabel,d.totals[0],od],['OÍDO IZQUIERDO',oiLabel,d.totals[1],oi],['MEDIA BILATERAL',free?'Porcentaje de aciertos':'Media descriptiva',d.totals[2],ink],['LATERALIDAD',free?'Índice IL':'No aplicable',d.totals[3],ink]];
   cards.forEach((c,i)=>{const x=M+i*(CW+9)/4,w=(CW-27)/4;rect(x,244,w,78,soft);rect(x,244,w,2,c[3]);text(c[0],x+10,260,7.4,true,muted);let value=fmt(c[2]);if(i===3&&c[2]>0)value='+'+value;text(value,x+10,293,27,true,c[3]);if(c[2]!==null)text('%',x+w-10,292,10,false,muted,'right');text(c[1],x+10,309,8,false,muted);});
-  text('01',M,347,9,true,od);text(free?'Referencia por edad y dificultad':'Resultados por dificultad',M+23,347,14,true);
+  text('01',M,347,9,true,accent);text(free?'Referencia por edad y dificultad':'Resultados por dificultad',M+23,347,14,true);
   text(g?'Grupo '+g.label+' · n = '+g.n+' · referencia publicada':free?'Comparación por edad no disponible':'Aciertos del oído atendido e intrusiones del no atendido',M,364,8.5,false,muted);
   const xScore=M+130,xNorm=M+221,xPlot=M+241,plotW=135,xZ=M+437,xP=W-M;
   text('MEDIDA',M,386,7.8,true,muted);text('RESULTADO',xScore,386,7.8,true,muted,'right');text(free?'MEDIA ± DT':'TIPO',xNorm,386,7.8,true,muted,'right');text(free?'DISTRIBUCIÓN DE REFERENCIA':'PORCENTAJE REGISTRADO',xPlot,386,6.8,true,muted);if(free){text('z (DT)',xZ,386,8,true,muted,'right');text('P EST.*',xP,386,7.8,true,muted,'right');}
   d.difficulty.forEach((row,i)=>[1,2].forEach((ear,j)=>{const y=405+(i*2+j)*23,v=row[ear],c=ear===1?od:oi,label=(i+1)+' '+(i===0?'par':'pares')+' / '+(ear===1?'OD':'OI');const ns=g?(ear===1?g.od[i]:g.oi[i]):null;
-    if(i%2===0)rect(M-4,y-12,CW+8,23,'#f7f9fa');dot(M+2,y-3,2.7,c);text(label,M+12,y,9,true);text(v===null?'—':fmt(v)+' %',xScore,y,10,true,c,'right');text(ns?fmt(ns[0])+' ± '+fmt(ns[1]):free?'—':(ear===1?odLabel:oiLabel).replace(/ (OD|OI)/,''),xNorm,y,9,false,muted,'right');
+    if(i%2===0)rect(M-4,y-12,CW+8,23,'#f7f9fa');dot(M+2,y-3,2.7,c);text(label,M+12,y,9,true,c);text(v===null?'—':fmt(v)+' %',xScore,y,10,true,c,'right');text(ns?fmt(ns[0])+' ± '+fmt(ns[1]):free?'—':(ear===1?odLabel:oiLabel).replace(/ (OD|OI)/,''),xNorm,y,9,false,muted,'right');
     stroke(xPlot,y-3,xPlot+plotW,y-3,line,1);[0,50,100].forEach(t=>stroke(xPlot+t/100*plotW,y-6,xPlot+t/100*plotW,y,line,.5));
     if(ns){const lo=Math.max(0,ns[0]-ns[1]),hi=Math.min(100,ns[0]+ns[1]);rect(xPlot+lo/100*plotW,y-7,(hi-lo)/100*plotW,8,'#d5e1e8');stroke(xPlot+ns[0]/100*plotW,y-9,xPlot+ns[0]/100*plotW,y+3,ink,1);}
     if(v!==null){dot(xPlot+Math.max(0,Math.min(100,v))/100*plotW,y-3,3.4,c);}
-    const z=ns&&v!==null?(v-ns[0])/ns[1]:null;if(free){text(z===null?'—':(z>0?'+':'')+fmt(z,2),xZ,y,9,true,ink,'right');text(z===null?'—':pct(z),xP,y,10,true,ink,'right');}
+    const z=ns&&v!==null?(v-ns[0])/ns[1]:null;if(free){text(z===null?'—':(z>0?'+':'')+fmt(z,2),xZ,y,9,true,c,'right');text(z===null?'—':pct(z),xP,y,10,true,c,'right');}
   }));
   text('0',xPlot,534,7,false,muted,'center');text('50',xPlot+plotW/2,534,7,false,muted,'center');text('100 %',xPlot+plotW,534,7,false,muted,'center');
   text(g?'Punto: resultado  ·  Banda: media ± 1 DT':'Punto: resultado registrado',M,534,8,false,muted);
@@ -85,11 +86,12 @@ function buildClinicalPdf_(d, preview=false) {
   let explain=free?'IL = (OD - OI) / (OD + OI) × 100. Un valor positivo indica predominio OD.':'En atención focalizada, las marcas del oído no atendido representan intrusiones. El IL no se interpreta con la referencia de escucha libre.';
   if(!g)explain+=' '+norm.reason;
   const noteLines=wrap(detail+' '+explain+' Observaciones: '+(d.notes||'Sin observaciones registradas.'),CW-24,8.4);
-  rect(M,692,CW,65,soft);text('LECTURA DEL INFORME',M+12,706,7.5,true,muted);noteLines.slice(0,3).forEach((s,i)=>text(s,M+12,720+i*11,8.4));
-  if(noteLines.length>3)text('Notas completas en la página siguiente.',M+12,752,7.5,true,od);
-  text(free?'* P est.: estimación normal; z = (resultado - media) / DT. No son percentiles empíricos.':'Atención focalizada: resultados descriptivos sin comparación normativa ni percentiles.',M,772,7.6,false,muted);
-  text('Referencia: participantes diestros, atención dividida, 65 dB nHL. No implica diagnóstico.',M,783,7.6,false,muted);
-  text('Fuente: Zenker Castro et al. (2007), Rev. Logop. Foniatr. Audiol. 27(2):74-85, tabla 1.',M,794,7.3,false,muted);
+  rect(M,692,CW,62,soft);text('LECTURA DEL INFORME',M+12,706,7.5,true,muted);noteLines.slice(0,3).forEach((s,i)=>text(s,M+12,720+i*11,8.4));
+  if(noteLines.length>3)text('Notas completas en la página siguiente.',M+12,752,7.5,true,accent);
+  text(free?'* P est.: estimación normal; z = (resultado - media) / DT. No son percentiles empíricos.':'Atención focalizada: resultados descriptivos sin comparación normativa ni percentiles.',M,764,7.2,false,muted);
+  text('Referencia: participantes diestros, atención dividida, 65 dB nHL. No implica diagnóstico.',M,774,7.2,false,muted);
+  text('Norma: Zenker Castro et al. (2007). Rev. Logop. Foniatr. Audiol. 27(2):74-85, tabla 1.',M,784,7.1,false,muted);
+  text('Referencia clínica: Zenker Castro et al. (2008). Acta Otorrinolaringol. Esp. 59(10):503-505.',M,794,7.1,false,muted);
   if(noteLines.length>3){const continued=wrap(detail+' '+explain+' Observaciones: '+(d.notes||'Sin observaciones registradas.'),CW,9.5);const chunks=[];for(let i=0;i<continued.length;i+=46)chunks.push(continued.slice(i,i+46));chunks.forEach(chunk=>{out=[];pages.push(out);text('Notas de la evaluación',M,70,24,true);text('Lista '+d.list+' · '+(d.name||'Sin identificar'),M,94,11,false,muted);stroke(M,110,W-M,110,od,1.5);chunk.forEach((s,i)=>text(s,M,138+i*13,9.5));});}
   pages.forEach((p,i)=>{out=p;footer(i+1,pages.length);});
   if(preview)return svg.map((lines,i)=>'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+W+' '+H+'" font-family="Arial,Helvetica,sans-serif" role="img" aria-label="Informe de Lista '+d.list+', página '+(i+1)+'"><rect width="'+W+'" height="'+H+'" fill="white"/>'+lines.join('')+'</svg>').join('');
