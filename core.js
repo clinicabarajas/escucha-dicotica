@@ -3,6 +3,8 @@ import { clinicalAge_ } from './report.js';
 
 export const MODES = ['Atención dividida','Atención focalizada - oído derecho','Atención focalizada - oído izquierdo'];
 
+export const EXAMPLE_PROFILE = Object.freeze({age:10,hand:'Diestro',odDb:'64',oiDb:'64'});
+
 const EXAMPLE_BITS = {
   1:['111111111111101111110011110101111001111001111011111111011111111001111011011011011','101000010011001010110111110111001001011101001001100101100100010110110111101101001'],
   2:['010111110101110001001111011101111111111111111111111111111110011111110111111111110','100000000000001000000000000010000000000000000000000000000001100000000000000000000'],
@@ -26,8 +28,13 @@ export function blankSession() {
 }
 export function exampleSession() {
   const session=blankSession();
+  const examYear=Number(session.participant.exam.slice(0,4));
+  session.participant.birth=`${examYear-EXAMPLE_PROFILE.age}-01-01`;
+  session.participant.hand=EXAMPLE_PROFILE.hand;
   for(const n of [1,2,3]){
     const [od,oi]=EXAMPLE_BITS[n];
+    session.lists[n].odDb=EXAMPLE_PROFILE.odDb;
+    session.lists[n].oiDb=EXAMPLE_PROFILE.oiDb;
     session.lists[n].scores=Array.from({length:81},(_,i)=>[od[i]==='1',oi[i]==='1']);
   }
   return session;

@@ -50,11 +50,13 @@ function renderList(){
 }
 function resetAll(){
   releasePdf();session=blankSession();active=1;dirty=false;$('evaluationForm').reset();
+  $('exampleContext').hidden=true;
   document.querySelectorAll('[data-list] span').forEach((span,i)=>span.textContent=['Atención dividida','Focalizada · OD','Focalizada · OI'][i]);
   fields.forEach(id=>$(id).value=session.participant[id]);renderList();
 }
 function loadExample(){
   releasePdf();session=exampleSession();active=1;dirty=true;$('evaluationForm').reset();
+  $('exampleContext').hidden=false;$('exampleContext').open=true;
   document.querySelectorAll('[data-list] span').forEach((span,i)=>span.textContent=['Atención dividida','Focalizada · OD','Focalizada · OI'][i]);
   fields.forEach(id=>$(id).value=session.participant[id]);$('exampleDialog').close();renderList();
   setStatus('Ejemplo anónimo cargado. Revisa las tres listas antes de calcular.');document.querySelector('[data-list="1"]').focus();
@@ -95,6 +97,6 @@ $('clearList').addEventListener('click',()=>$('clearDialog').showModal());
 $('cancelClear').addEventListener('click',()=>$('clearDialog').close());
 $('acceptClear').addEventListener('click',()=>{session.lists[active].scores=Array.from({length:81},()=>[false,false]);session.lists[active].complete=false;dirty=true;$('clearDialog').close();renderList()});
 window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue=''}});
-window.addEventListener('pagehide',()=>{releasePdf();session=blankSession();dirty=false;$('evaluationForm').reset();$('items').replaceChildren()});
+window.addEventListener('pagehide',()=>{releasePdf();session=blankSession();dirty=false;$('evaluationForm').reset();$('exampleContext').hidden=true;$('items').replaceChildren()});
 window.addEventListener('pageshow',e=>{if(e.persisted)resetAll()});
 resetAll();
