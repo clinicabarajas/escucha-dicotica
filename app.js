@@ -1,16 +1,16 @@
-import { TEST_LISTS } from './data.js?v=1.8';
-import { MODES, blankSession, calculate, exampleSession } from './core.js?v=1.8';
-import { buildClinicalPdf_, clinicalNorm_ } from './report.js?v=1.8';
-import { APP_VERSION } from './version.js?v=1.8';
+import { TEST_LISTS } from './data.js?v=1.9';
+import { MODES, blankSession, calculate, calculateIntegrated, exampleSession, integratedReadiness } from './core.js?v=1.9';
+import { buildClinicalPdf_, buildIntegratedPdf_, clinicalNorm_ } from './report.js?v=1.9';
+import { APP_VERSION } from './version.js?v=1.9';
 
 const $=id=>document.getElementById(id);
 document.querySelectorAll('[data-version]').forEach(el=>el.textContent=APP_VERSION);
-let session=blankSession(),active=1,pdfUrl=null,dirty=false;
+let session=blankSession(),active=1,pdfUrl=null,pdfKey='',previewType='list',dirty=false;
 const fields=['name','patient','birth','exam','hand','examiner','notes'];
-const listFields=['mode','odDb','oiDb'];
+const listFields=['mode','odDb','oiDb','otherErrors'];
 const format=v=>v===null?'—':v.toLocaleString('es-ES',{maximumFractionDigits:1})+' %';
 function setStatus(message,error=false){$('status').textContent=message;$('status').classList.toggle('error',error)}
-function releasePdf(){if(pdfUrl){URL.revokeObjectURL(pdfUrl);pdfUrl=null}$('pdfPreview').replaceChildren()}
+function releasePdf(){if(pdfUrl){URL.revokeObjectURL(pdfUrl);pdfUrl=null}pdfKey='';$('pdfPreview').replaceChildren()}
 function refreshResults(){
   releasePdf();
   const list=session.lists[active];
@@ -19,11 +19,15 @@ function refreshResults(){
   $('odLabel').textContent=list.mode===MODES[2]?'Intrusiones OD':'Aciertos OD';$('oiLabel').textContent=list.mode===MODES[1]?'Intrusiones OI':'Aciertos OI';
   $('preview').disabled=$('download').disabled=!list.complete;
   if(data){const norm=clinicalNorm_(data);$('normStatus').textContent=norm.group?`Referencia: ${norm.group.label}. Incluye desviación en z y percentiles estimados por oído y dificultad.`:norm.reason;}
+  const integrated=integratedReadiness(session),integratedStatus=$('integratedStatus');
+  $('previewIntegrated').disabled=$('downloadIntegrated').disabled=!integrated.ok;
+  integratedStatus.textContent=integrated.reason;integratedStatus.classList.toggle('ready',integrated.ok);integratedStatus.classList.toggle('error',!integrated.ok&&[1,2,3].every(n=>session.lists[n].complete));
   const marked=list.scores.reduce((n,r)=>n+Number(r[0])+Number(r[1]),0);$('markedCount').textContent=`${marked} dígitos marcados de 162`;
 }
 function onFieldChange(e){
   const id=e.target.id;
-  if(fields.includes(id))session.participant[id]=e.target.value;
+  if(id==='neutralReport')session.participant.neutralReport=e.target.checked;
+  else if(fields.includes(id))session.participant[id]=e.target.value;
   else if(listFields.includes(id)){session.lists[active][id]=e.target.value;session.lists[active].complete=false;updateInstruction();}
   else return;
   dirty=true;setStatus(session.lists[active].complete?'Informe actualizado. Puedes descargarlo.':'Revisa los 27 ítems antes de calcular.');refreshResults();
@@ -52,22 +56,29 @@ function resetAll(){
   releasePdf();session=blankSession();active=1;dirty=false;$('evaluationForm').reset();
   $('exampleContext').hidden=true;
   document.querySelectorAll('[data-list] span').forEach((span,i)=>span.textContent=['Atención dividida','Focalizada · OD','Focalizada · OI'][i]);
-  fields.forEach(id=>$(id).value=session.participant[id]);renderList();
+  fields.forEach(id=>$(id).value=session.participant[id]);$('neutralReport').checked=session.participant.neutralReport;renderList();
 }
 function loadExample(){
   releasePdf();session=exampleSession();active=1;dirty=true;$('evaluationForm').reset();
   $('exampleContext').hidden=false;$('exampleContext').open=true;
   document.querySelectorAll('[data-list] span').forEach((span,i)=>span.textContent=['Atención dividida','Focalizada · OD','Focalizada · OI'][i]);
-  fields.forEach(id=>$(id).value=session.participant[id]);$('exampleDialog').close();renderList();
+  fields.forEach(id=>$(id).value=session.participant[id]);$('neutralReport').checked=session.participant.neutralReport;$('exampleDialog').close();renderList();
   setStatus('Ejemplo anónimo cargado. Revisa las tres listas antes de calcular.');document.querySelector('[data-list="1"]').focus();
 }
 function createPdf(){
   const list=session.lists[active];if(!list.complete)throw new Error('Revisa y calcula la lista antes de descargar el informe.');
   const data=calculate(active,list,session.participant);
-  if(!pdfUrl)pdfUrl=URL.createObjectURL(new Blob([new Uint8Array(buildClinicalPdf_(data))],{type:'application/pdf'}));
+  const key='list-'+active;if(pdfUrl&&pdfKey!==key)releasePdf();
+  if(!pdfUrl){pdfUrl=URL.createObjectURL(new Blob([new Uint8Array(buildClinicalPdf_(data))],{type:'application/pdf'}));pdfKey=key;}
+  return {data,url:pdfUrl};
+}
+function createIntegratedPdf(){
+  const data=calculateIntegrated(session),key='integrated';if(pdfUrl&&pdfKey!==key)releasePdf();
+  if(!pdfUrl){pdfUrl=URL.createObjectURL(new Blob([new Uint8Array(buildIntegratedPdf_(data))],{type:'application/pdf'}));pdfKey=key;}
   return {data,url:pdfUrl};
 }
 function download(){try{const {data,url}=createPdf();const link=document.createElement('a');link.href=url;link.download=`TDD_Lista_${active}_${data.date.replaceAll('/','-')}.pdf`;document.body.append(link);link.click();link.remove();setStatus('PDF preparado para descargar. Ábrelo para imprimir.')}catch(e){setStatus(e.message,true)}}
+function downloadIntegrated(){try{const {data,url}=createIntegratedPdf();const link=document.createElement('a');link.href=url;link.download=`TDD_Informe_04_${data.date.replaceAll('/','-')}.pdf`;document.body.append(link);link.click();link.remove();setStatus('Informe 04 preparado para descargar. Ábrelo para imprimir.')}catch(e){setStatus(e.message,true)}}
 
 $('evaluationForm').addEventListener('submit',e=>e.preventDefault());
 $('evaluationForm').addEventListener('input',onFieldChange);
@@ -84,8 +95,9 @@ $('calculate').addEventListener('click',()=>{
 });
 $('cancelConfirm').addEventListener('click',()=>$('confirmDialog').close());
 $('acceptConfirm').addEventListener('click',()=>{session.lists[active].complete=true;dirty=true;$('confirmDialog').close();refreshResults();setStatus('Informe calculado. Puedes abrirlo o descargarlo.');$('preview').focus()});
-$('download').addEventListener('click',download);$('dialogDownload').addEventListener('click',download);
-$('preview').addEventListener('click',()=>{try{const {data}=createPdf();$('pdfTitle').textContent='Informe de Lista '+active;$('pdfPreview').innerHTML=buildClinicalPdf_(data,true);$('pdfDialog').showModal()}catch(e){setStatus(e.message,true)}});
+$('download').addEventListener('click',download);$('downloadIntegrated').addEventListener('click',downloadIntegrated);$('dialogDownload').addEventListener('click',()=>previewType==='integrated'?downloadIntegrated():download());
+$('preview').addEventListener('click',()=>{try{const {data}=createPdf();previewType='list';$('pdfTitle').textContent='Informe de Lista '+active;$('pdfPreview').innerHTML=buildClinicalPdf_(data,true);$('pdfDialog').showModal()}catch(e){setStatus(e.message,true)}});
+$('previewIntegrated').addEventListener('click',()=>{try{const {data}=createIntegratedPdf();previewType='integrated';$('pdfTitle').textContent='Informe 04 · Perfil integrado';$('pdfPreview').innerHTML=buildIntegratedPdf_(data,true);$('pdfDialog').showModal()}catch(e){setStatus(e.message,true)}});
 $('closePreview').addEventListener('click',()=>$('pdfDialog').close());
 $('loadExample').addEventListener('click',()=>$('exampleDialog').showModal());
 $('cancelExample').addEventListener('click',()=>$('exampleDialog').close());
