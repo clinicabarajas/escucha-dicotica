@@ -1,5 +1,5 @@
-import { PDF_LOGO } from './logo-pdf.js';
-import { APP_VERSION } from './version.js';
+import { PDF_LOGO } from './logo-pdf.js?v=1.8';
+import { APP_VERSION } from './version.js?v=1.8';
 // Referencia descriptiva publicada: Zenker Castro et al., 2007, tabla 1, p. 78.
 // Percentiles estimados bajo distribución normal; no son percentiles empíricos publicados.
 const TDD_NORMS = [

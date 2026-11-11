@@ -1,7 +1,7 @@
-import { TEST_LISTS } from './data.js';
-import { MODES, blankSession, calculate, exampleSession } from './core.js';
-import { buildClinicalPdf_, clinicalNorm_ } from './report.js';
-import { APP_VERSION } from './version.js';
+import { TEST_LISTS } from './data.js?v=1.8';
+import { MODES, blankSession, calculate, exampleSession } from './core.js?v=1.8';
+import { buildClinicalPdf_, clinicalNorm_ } from './report.js?v=1.8';
+import { APP_VERSION } from './version.js?v=1.8';
 
 const $=id=>document.getElementById(id);
 document.querySelectorAll('[data-version]').forEach(el=>el.textContent=APP_VERSION);
