@@ -1,5 +1,5 @@
-import { PDF_LOGO } from './logo-pdf.js?v=1.9';
-import { APP_VERSION } from './version.js?v=1.9';
+import { PDF_LOGO } from './logo-pdf.js?v=1.10';
+import { APP_VERSION } from './version.js?v=1.10';
 // Referencia descriptiva publicada: Zenker Castro et al., 2007, tabla 1, p. 78.
 // Percentiles estimados bajo distribución normal; no son percentiles empíricos publicados.
 const TDD_NORMS = [
@@ -59,7 +59,7 @@ function buildClinicalPdf_(d, preview=false) {
   function legend(x,y){dot(x,y-3,3,od);text(odLabel,x+8,y,8,false,od);dot(x+108,y-3,3,oi);text(oiLabel,x+116,y,8,false,oi);}
   const logoW=69,logoH=logoW*PDF_LOGO.height/PDF_LOGO.width;
   if(branded){vector('<image href="./logo-clinica-barajas.png" x="'+M+'" y="22" width="'+logoW+'" height="'+logoH+'"/>');out.push('q '+num(logoW)+' 0 0 '+num(logoH)+' '+num(M)+' '+num(H-22-logoH)+' cm /Logo Do Q');}
-  else{text('INFORME SIN IDENTIDAD INSTITUCIONAL',M,43,8,true,muted);text('TEST DE DÍGITOS DICÓTICOS',M,59,9,true,accent);}
+  else{text('TEST DE DÍGITOS DICÓTICOS',M,51,9,true,accent);}
   text('INFORME AUDIOLÓGICO',W-M,43,8,true,muted,'right');text('TDD / LISTA '+d.list,W-M,59,11,true,ink,'right');
   text('Escucha dicótica',branded?M+90:M,84,27,true);text('Test de Dígitos Dicóticos',branded?M+90:M,105,11,false,muted);
   rect(M,131,CW,2,accent);text(d.mode,M,151,10,true);text(d.completed===100?'EVALUACIÓN COMPLETA':'REGISTRO INCOMPLETO · '+fmt(d.completed,0)+' %',W-M,151,8,true,muted,'right');
@@ -105,6 +105,23 @@ function buildClinicalPdf_(d, preview=false) {
   return Array.from(pdf,c=>c.charCodeAt(0));
 }
 
+const TDD_LUCIDE_ICONS=Object.freeze({
+  brain:[
+    'M12 18V5',
+    'M15 13a4.17 4.17 0 0 1-3-4 4.17 4.17 0 0 1-3 4',
+    'M17.598 6.5A3 3 0 1 0 12 5a3 3 0 1 0-5.598 1.5',
+    'M17.997 5.125a4 4 0 0 1 2.526 5.77',
+    'M18 18a4 4 0 0 0 2-7.464',
+    'M19.967 17.483A4 4 0 1 1 12 18a4 4 0 1 1-7.967-.517',
+    'M6 18a4 4 0 0 1-2-7.464',
+    'M6.003 5.125a4 4 0 0 0-2.526 5.77'
+  ],
+  ear:[
+    'M6 8.5a6.5 6.5 0 1 1 13 0c0 6-6 6-6 10a3.5 3.5 0 1 1-7 0',
+    'M15 8.5a2.5 2.5 0 0 0-5 0v1a2 2 0 1 1 0 4'
+  ]
+});
+
 function buildIntegratedPdf_(d,preview=false){
   const W=595.28,H=841.89,M=34,CW=W-2*M;
   const ink='#183348',muted='#617789',line='#dce5eb',soft='#f1f6f8',od='#c62828',oi='#1565c0',accent='#087f8c',white='#ffffff',branded=!d.neutralReport;
@@ -125,23 +142,56 @@ function buildIntegratedPdf_(d,preview=false){
   function wrap(s,max,size=10,bold=false){const lines=[];String(s||'').split(/\r?\n/).forEach(p=>{let cur='';p.split(/\s+/).filter(Boolean).forEach(word=>{if(cur&&width(cur+' '+word,size,bold)>max){lines.push(cur);cur=word;}else cur+=(cur?' ':'')+word;});if(cur)lines.push(cur);});return lines;}
   const fmt=(v,dec=1)=>v===null||v===undefined||!isFinite(v)?'—':Number(v).toFixed(dec).replace('.',',');
   const signed=v=>v===null||v===undefined||!isFinite(v)?'—':(v>0?'+':'')+fmt(v);
-  function brain(cx,y,s=1){
-    const l=`M ${cx} ${y+48*s} C ${cx-8*s} ${y+42*s},${cx-8*s} ${y+34*s},${cx-17*s} ${y+34*s} C ${cx-30*s} ${y+36*s},${cx-38*s} ${y+26*s},${cx-32*s} ${y+17*s} C ${cx-38*s} ${y+6*s},${cx-24*s} ${y-2*s},${cx-16*s} ${y+5*s} C ${cx-10*s} ${y-4*s},${cx} ${y+1*s},${cx} ${y+11*s}`;
-    const r=`M ${cx} ${y+48*s} C ${cx+8*s} ${y+42*s},${cx+8*s} ${y+34*s},${cx+17*s} ${y+34*s} C ${cx+30*s} ${y+36*s},${cx+38*s} ${y+26*s},${cx+32*s} ${y+17*s} C ${cx+38*s} ${y+6*s},${cx+24*s} ${y-2*s},${cx+16*s} ${y+5*s} C ${cx+10*s} ${y-4*s},${cx} ${y+1*s},${cx} ${y+11*s}`;
-    vector('<path d="'+l+' '+r+'" fill="none" stroke="'+ink+'" stroke-width="1.5" stroke-linecap="round"/>');
-    const py=v=>H-v;out.push(color(ink)+' RG 1.5 w '+`${num(cx)} ${num(py(y+48*s))} m ${num(cx-8*s)} ${num(py(y+42*s))} ${num(cx-8*s)} ${num(py(y+34*s))} ${num(cx-17*s)} ${num(py(y+34*s))} c ${num(cx-30*s)} ${num(py(y+36*s))} ${num(cx-38*s)} ${num(py(y+26*s))} ${num(cx-32*s)} ${num(py(y+17*s))} c ${num(cx-38*s)} ${num(py(y+6*s))} ${num(cx-24*s)} ${num(py(y-2*s))} ${num(cx-16*s)} ${num(py(y+5*s))} c ${num(cx-10*s)} ${num(py(y-4*s))} ${num(cx)} ${num(py(y+1*s))} ${num(cx)} ${num(py(y+11*s))} c S ${num(cx)} ${num(py(y+48*s))} m ${num(cx+8*s)} ${num(py(y+42*s))} ${num(cx+8*s)} ${num(py(y+34*s))} ${num(cx+17*s)} ${num(py(y+34*s))} c ${num(cx+30*s)} ${num(py(y+36*s))} ${num(cx+38*s)} ${num(py(y+26*s))} ${num(cx+32*s)} ${num(py(y+17*s))} c ${num(cx+38*s)} ${num(py(y+6*s))} ${num(cx+24*s)} ${num(py(y-2*s))} ${num(cx+16*s)} ${num(py(y+5*s))} c ${num(cx+10*s)} ${num(py(y-4*s))} ${num(cx)} ${num(py(y+1*s))} ${num(cx)} ${num(py(y+11*s))} c S`);
-    stroke(cx,y+11*s,cx,y+47*s,line,1);
+  function arcCubics(x1,y1,rx,ry,rotation,largeArc,sweep,x2,y2){
+    rx=Math.abs(rx);ry=Math.abs(ry);if(!rx||!ry||(x1===x2&&y1===y2))return [];
+    const phi=rotation*Math.PI/180,cp=Math.cos(phi),sp=Math.sin(phi),dx=(x1-x2)/2,dy=(y1-y2)/2;
+    const x1p=cp*dx+sp*dy,y1p=-sp*dx+cp*dy;let radii=x1p*x1p/(rx*rx)+y1p*y1p/(ry*ry);
+    if(radii>1){const scale=Math.sqrt(radii);rx*=scale;ry*=scale;}
+    const rx2=rx*rx,ry2=ry*ry,xp2=x1p*x1p,yp2=y1p*y1p,den=rx2*yp2+ry2*xp2;
+    const sign=largeArc===sweep?-1:1,coef=sign*Math.sqrt(Math.max(0,(rx2*ry2-rx2*yp2-ry2*xp2)/(den||1)));
+    const cxp=coef*rx*y1p/ry,cyp=-coef*ry*x1p/rx,cx=cp*cxp-sp*cyp+(x1+x2)/2,cy=sp*cxp+cp*cyp+(y1+y2)/2;
+    const theta1=Math.atan2((y1p-cyp)/ry,(x1p-cxp)/rx),theta2=Math.atan2((-y1p-cyp)/ry,(-x1p-cxp)/rx);let delta=theta2-theta1;
+    if(!sweep&&delta>0)delta-=Math.PI*2;if(sweep&&delta<0)delta+=Math.PI*2;
+    const count=Math.max(1,Math.ceil(Math.abs(delta)/(Math.PI/2))),step=delta/count,segments=[];
+    const point=t=>[cx+rx*cp*Math.cos(t)-ry*sp*Math.sin(t),cy+rx*sp*Math.cos(t)+ry*cp*Math.sin(t)];
+    const tangent=t=>[-rx*cp*Math.sin(t)-ry*sp*Math.cos(t),-rx*sp*Math.sin(t)+ry*cp*Math.cos(t)];
+    for(let i=0;i<count;i++){const a=theta1+i*step,b=a+step,k=4/3*Math.tan((b-a)/4),p1=point(a),p2=point(b),t1=tangent(a),t2=tangent(b);segments.push([p1[0]+k*t1[0],p1[1]+k*t1[1],p2[0]-k*t2[0],p2[1]-k*t2[1],p2[0],p2[1]]);}
+    return segments;
   }
-  function header(label){const logoW=65,logoH=logoW*PDF_LOGO.height/PDF_LOGO.width;if(branded){vector('<image href="./logo-clinica-barajas.png" x="'+M+'" y="18" width="'+logoW+'" height="'+logoH+'"/>');out.push('q '+num(logoW)+' 0 0 '+num(logoH)+' '+num(M)+' '+num(H-18-logoH)+' cm /Logo Do Q');}else{text('INFORME SIN IDENTIDAD INSTITUCIONAL',M,38,8,true,muted);text('TEST DE DÍGITOS DICÓTICOS',M,54,9,true,accent);}text('INFORME AUDIOLÓGICO',W-M,38,8,true,muted,'right');text(label,W-M,54,10,true,ink,'right');}
+  function pdfIconPath(d,x,y,size,mirror){
+    const tokens=d.match(/[AaCcHhLlMmVvZz]|[-+]?(?:\d*\.)?\d+(?:e[-+]?\d+)?/gi)||[],isCommand=t=>/^[A-Za-z]$/.test(t),scale=size/24;
+    const tx=v=>x+(mirror?24-v:v)*scale,ty=v=>H-(y+v*scale),point=(px,py)=>num(tx(px))+' '+num(ty(py));
+    let i=0,command='',px=0,py=0,sx=0,sy=0,path='';
+    while(i<tokens.length){if(isCommand(tokens[i]))command=tokens[i++];const relative=command===command.toLowerCase(),op=command.toUpperCase();
+      if(op==='M'){let nx=+tokens[i++],ny=+tokens[i++];if(relative){nx+=px;ny+=py;}px=nx;py=ny;sx=px;sy=py;path+=point(px,py)+' m ';command=relative?'l':'L';}
+      else if(op==='L'){let nx=+tokens[i++],ny=+tokens[i++];if(relative){nx+=px;ny+=py;}px=nx;py=ny;path+=point(px,py)+' l ';}
+      else if(op==='H'){let nx=+tokens[i++];if(relative)nx+=px;px=nx;path+=point(px,py)+' l ';}
+      else if(op==='V'){let ny=+tokens[i++];if(relative)ny+=py;py=ny;path+=point(px,py)+' l ';}
+      else if(op==='C'){let x1=+tokens[i++],y1=+tokens[i++],x2=+tokens[i++],y2=+tokens[i++],nx=+tokens[i++],ny=+tokens[i++];if(relative){x1+=px;y1+=py;x2+=px;y2+=py;nx+=px;ny+=py;}path+=point(x1,y1)+' '+point(x2,y2)+' '+point(nx,ny)+' c ';px=nx;py=ny;}
+      else if(op==='A'){const rx=+tokens[i++],ry=+tokens[i++],rotation=+tokens[i++],large=+tokens[i++]!==0,sweep=+tokens[i++]!==0;let nx=+tokens[i++],ny=+tokens[i++];if(relative){nx+=px;ny+=py;}const curves=arcCubics(px,py,rx,ry,rotation,large,sweep,nx,ny);if(!curves.length)path+=point(nx,ny)+' l ';else curves.forEach(c=>{path+=point(c[0],c[1])+' '+point(c[2],c[3])+' '+point(c[4],c[5])+' c ';});px=nx;py=ny;}
+      else if(op==='Z'){px=sx;py=sy;path+='h ';command='';}
+      else throw new Error('Comando SVG no compatible: '+command);
+    }
+    return path;
+  }
+  function lucideIcon(name,x,y,size,strokeColor,mirror=false,strokeWidth=1.8){
+    const paths=TDD_LUCIDE_ICONS[name];if(!paths)throw new Error('Icono Lucide no encontrado: '+name);
+    const scale=size/24,transform=mirror?'translate('+(x+size)+' '+y+') scale('+(-scale)+' '+scale+')':'translate('+x+' '+y+') scale('+scale+')';
+    vector('<g data-icon="'+name+'" transform="'+transform+'" fill="none" stroke="'+strokeColor+'" stroke-width="'+strokeWidth+'" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke" aria-hidden="true">'+paths.map(d=>'<path d="'+d+'" vector-effect="non-scaling-stroke"/>').join('')+'</g>');
+    paths.forEach(d=>out.push(color(strokeColor)+' RG '+num(strokeWidth)+' w 1 J 1 j '+pdfIconPath(d,x,y,size,mirror)+'S'));
+  }
+  function header(label){const logoW=65,logoH=logoW*PDF_LOGO.height/PDF_LOGO.width;if(branded){vector('<image href="./logo-clinica-barajas.png" x="'+M+'" y="18" width="'+logoW+'" height="'+logoH+'"/>');out.push('q '+num(logoW)+' 0 0 '+num(logoH)+' '+num(M)+' '+num(H-18-logoH)+' cm /Logo Do Q');}else{text('TEST DE DÍGITOS DICÓTICOS',M,46,9,true,accent);}text('INFORME AUDIOLÓGICO',W-M,38,8,true,muted,'right');text(label,W-M,54,10,true,ink,'right');}
   function footer(page){stroke(M,799,W-M,799);text(branded?'CLÍNICA BARAJAS':'ESCUCHA DICÓTICA',M,815,8,true);text('Informe 04  ·  '+(d.date||'Sin fecha')+'  ·  '+APP_VERSION+'  ·  '+page+'/2',W-M,815,8,false,muted,'right');}
   function brainPanel(x,y,w,h,title,attended,mGain,mSuppress,focus){
     rect(x,y,w,h,'#f8fafb',line);text(title,x+13,y+20,11,true);text('MODULACIÓN SOSTENIDA',x+w-13,y+20,6.8,true,muted,'right');
-    const cx=x+w/2,by=y+48;brain(cx,by,.88);const lx=x+48,rx=x+w-48,ey=y+115;dot(lx,ey,17,white,oi);dot(rx,ey,17,white,od);text('OI',lx,ey+4,9,true,oi,'center');text('OD',rx,ey+4,9,true,od,'center');
+    const cx=x+w/2,lx=x+48,rx=x+w-48,ey=y+121;lucideIcon('brain',cx-27,y+36,54,ink,false,1.9);
     const targetX=attended==='OD'?rx:lx,targetColor=attended==='OD'?od:oi,otherX=attended==='OD'?lx:rx,otherColor=attended==='OD'?oi:od;
-    arrow(cx,by+48,targetX,ey-19,targetColor,Math.min(5,1.5+Math.abs(mGain.index||0)/28));arrow(cx,by+48,otherX,ey-19,otherColor,1.2,true);
-    text('Foco '+attended,targetX,ey+31,8,true,targetColor,'center');text('Competidor',otherX,ey+31,8,false,muted,'center');
-    text('LB '+fmt(mGain.base)+' / AF '+fmt(mGain.focused),targetX,ey+45,7.4,true,targetColor,'center');text('Aciertos '+signed(mGain.delta)+' pp',targetX,ey+57,7.4,true,targetColor,'center');
-    text('LB '+fmt(mSuppress.base)+' / AF '+fmt(mSuppress.focused),otherX,ey+45,7.4,true,otherColor,'center');text('Intrusiones '+signed(-mSuppress.delta)+' pp',otherX,ey+57,7.4,true,otherColor,'center');
+    const targetEndX=targetX+(attended==='OD'?-23:23),otherEndX=otherX+(attended==='OD'?23:-23);
+    arrow(cx+(attended==='OD'?13:-13),y+77,targetEndX,ey-15,targetColor,Math.min(4.2,1.5+Math.abs(mGain.index||0)/32));arrow(cx+(attended==='OD'?-13:13),y+77,otherEndX,ey-15,otherColor,1.2,true);
+    rect(lx-21,ey-21,42,42,'#f1f6fd',oi,.8);rect(rx-21,ey-21,42,42,'#fdf2f2',od,.8);lucideIcon('ear',lx-14,ey-14,28,oi,true,1.8);lucideIcon('ear',rx-14,ey-14,28,od,false,1.8);
+    text(attended==='OI'?'OI · FOCO':'OI · COMPETIDOR',lx,ey+31,7.1,true,attended==='OI'?oi:muted,'center');text(attended==='OD'?'OD · FOCO':'OD · COMPETIDOR',rx,ey+31,7.1,true,attended==='OD'?od:muted,'center');
+    text('LB '+fmt(mGain.base)+' / AF '+fmt(mGain.focused),targetX,ey+44,7.4,true,targetColor,'center');text('Aciertos '+signed(mGain.delta)+' pp',targetX,ey+56,7.4,true,targetColor,'center');
+    text('LB '+fmt(mSuppress.base)+' / AF '+fmt(mSuppress.focused),otherX,ey+44,7.4,true,otherColor,'center');text('Intrusiones '+signed(-mSuppress.delta)+' pp',otherX,ey+56,7.4,true,otherColor,'center');
     rect(x+13,y+h-28,w-26,18,white);text('Selectividad acierto - intrusión: '+signed(focus.selectivity)+' pp',x+w/2,y+h-15,7.8,true,ink,'center');
   }
   function loadPanel(x,y,w,h,title,facKey,supKey,facColor,supColor){

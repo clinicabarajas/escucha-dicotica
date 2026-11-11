@@ -1,4 +1,4 @@
-# Escucha dicótica · Clínica Barajas · V1.9
+# Escucha dicótica · Clínica Barajas · V1.10
 
 Plantilla web del Test de Dígitos Dicóticos (TDD). Introduce las respuestas de cualquiera de las tres listas y descarga informes PDF A4 verticales. Permite generar cada informe con identidad de Clínica Barajas o en formato neutro, sin logo ni mención institucional.
 
@@ -48,6 +48,14 @@ Para revisar localmente, sirve esta carpeta con un servidor estático (por ejemp
 Pruebas sin dependencias: `node --test core.test.js` (Node 20 o posterior). Verifican denominadores, independencia de listas, ceros, pares solapados, edad, límites normativos, percentiles, estructura PDF y ausencia de mecanismos de persistencia/envío.
 
 El logotipo pertenece a Clínica Barajas. La referencia bibliográfica se conserva en la web y en cada informe. Si se activa el formato neutro, el PDF no incorpora el logo ni menciones institucionales.
+
+Los iconos vectoriales de cerebro y oído proceden de [Lucide](https://lucide.dev/) y se distribuyen con licencia ISC. El aviso completo se conserva en `THIRD_PARTY_NOTICES.md`.
+
+## V1.10
+
+- Sustitución del esquema artesanal por iconos vectoriales profesionales de cerebro y oído de Lucide.
+- Oídos diferenciados según la convención audiológica: OD en rojo y OI en azul, con trayectorias diagonales más claras.
+- Eliminada la frase redundante «Informe sin identidad institucional» del formato neutro.
 
 ## V1.9
 
