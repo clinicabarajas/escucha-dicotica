@@ -1,5 +1,6 @@
-import { PDF_LOGO } from './logo-pdf.js?v=1.10';
-import { APP_VERSION } from './version.js?v=1.10';
+import { PDF_LOGO } from './logo-pdf.js?v=1.11';
+import { APP_VERSION } from './version.js?v=1.11';
+import { BRAIN_IMAGE } from './brain-image.js?v=1.11';
 // Referencia descriptiva publicada: Zenker Castro et al., 2007, tabla 1, p. 78.
 // Percentiles estimados bajo distribución normal; no son percentiles empíricos publicados.
 const TDD_NORMS = [
@@ -53,6 +54,7 @@ function buildClinicalPdf_(d, preview=false) {
   const fmt=(v,dec=1)=>v===null||v===undefined||!isFinite(v)?'—':Number(v).toFixed(dec).replace('.',',');
   const pct=z=>{const p=clinicalPercentile_(z);return p<1?'<1':p>99?'>99':String(Math.round(p));};
   const norm=clinicalNorm_(d),g=norm.group,free=d.mode==='Atención dividida';
+  const participantName=d.name||(d.isExample?'CASO DE EJEMPLO · ANÓNIMO':'Sin identificar');
   const odLabel=d.mode.includes('oído izquierdo')?'Intrusiones OD':'Aciertos OD';
   const oiLabel=d.mode.includes('oído derecho')?'Intrusiones OI':'Aciertos OI';
   function footer(page,total){stroke(M,799,W-M,799);text(branded?'CLÍNICA BARAJAS':'ESCUCHA DICÓTICA',M,815,8,true);text('Lista '+d.list+'  ·  '+(d.date||'Sin fecha')+'  ·  '+APP_VERSION+'  ·  '+page+'/'+total,W-M,815,8,false,muted,'right');}
@@ -64,7 +66,7 @@ function buildClinicalPdf_(d, preview=false) {
   text('Escucha dicótica',branded?M+90:M,84,27,true);text('Test de Dígitos Dicóticos',branded?M+90:M,105,11,false,muted);
   rect(M,131,CW,2,accent);text(d.mode,M,151,10,true);text(d.completed===100?'EVALUACIÓN COMPLETA':'REGISTRO INCOMPLETO · '+fmt(d.completed,0)+' %',W-M,151,8,true,muted,'right');
   rect(M,162,CW,66,soft);
-  text('PARTICIPANTE',M+12,177,7.5,true,muted);let nameSize=12;while(nameSize>8&&wrap(d.name||'Sin identificar',310,nameSize,true).length>2)nameSize--;const nameLines=wrap(d.name||'Sin identificar',310,nameSize,true);nameLines.forEach((s,i)=>text(s,M+12,193+i*13,nameSize,true));
+  text('PARTICIPANTE',M+12,177,7.5,true,muted);let nameSize=12;while(nameSize>8&&wrap(participantName,310,nameSize,true).length>2)nameSize--;const nameLines=wrap(participantName,310,nameSize,true);nameLines.forEach((s,i)=>text(s,M+12,193+i*13,nameSize,true));
   text('FECHA',W-M-132,177,7.5,true,muted);text(d.date||'No consta',W-M-132,194,11,true);
   text('ID: '+(d.patient||'—')+'   ·   Edad: '+(d.age===null?'No consta':d.age+' años'),M+12,218,8.5,false,muted);
   text('Lateralidad: '+(d.hand||'No consta'),W-M-132,218,8.5,false,muted);
@@ -95,7 +97,7 @@ function buildClinicalPdf_(d, preview=false) {
   text('Referencia: participantes diestros, atención dividida, 65 dB nHL. No implica diagnóstico.',M,774,7.2,false,muted);
   text('Norma: Zenker Castro et al. (2007). Rev. Logop. Foniatr. Audiol. 27(2):74-85, tabla 1.',M,784,7.1,false,muted);
   text('Referencia clínica: Zenker Castro et al. (2008). Acta Otorrinolaringol. Esp. 59(10):503-505.',M,794,7.1,false,muted);
-  if(noteLines.length>3){const continued=wrap(detail+' '+explain+' Observaciones: '+(d.notes||'Sin observaciones registradas.'),CW,9.5);const chunks=[];for(let i=0;i<continued.length;i+=46)chunks.push(continued.slice(i,i+46));chunks.forEach(chunk=>{out=[];pages.push(out);text('Notas de la evaluación',M,70,24,true);text('Lista '+d.list+' · '+(d.name||'Sin identificar'),M,94,11,false,muted);stroke(M,110,W-M,110,od,1.5);chunk.forEach((s,i)=>text(s,M,138+i*13,9.5));});}
+  if(noteLines.length>3){const continued=wrap(detail+' '+explain+' Observaciones: '+(d.notes||'Sin observaciones registradas.'),CW,9.5);const chunks=[];for(let i=0;i<continued.length;i+=46)chunks.push(continued.slice(i,i+46));chunks.forEach(chunk=>{out=[];pages.push(out);text('Notas de la evaluación',M,70,24,true);text('Lista '+d.list+' · '+participantName,M,94,11,false,muted);stroke(M,110,W-M,110,od,1.5);chunk.forEach((s,i)=>text(s,M,138+i*13,9.5));});}
   pages.forEach((p,i)=>{out=p;footer(i+1,pages.length);});
   if(preview)return svg.map((lines,i)=>'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+W+' '+H+'" font-family="Arial,Helvetica,sans-serif" role="img" aria-label="Informe de Lista '+d.list+', página '+(i+1)+'"><rect width="'+W+'" height="'+H+'" fill="white"/>'+lines.join('')+'</svg>').join('');
   const objects=['<< /Type /Catalog /Pages 2 0 R >>','', '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>','<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>'];
@@ -104,23 +106,6 @@ function buildClinicalPdf_(d, preview=false) {
   let pdf='%PDF-1.4\n',offsets=[0];objects.forEach((s,i)=>{offsets.push(pdf.length);pdf+=(i+1)+' 0 obj\n'+s+'\nendobj\n';});const offset=pdf.length;pdf+='xref\n0 '+(objects.length+1)+'\n0000000000 65535 f \n'+offsets.slice(1).map(o=>String(o).padStart(10,'0')+' 00000 n \n').join('')+'trailer\n<< /Size '+(objects.length+1)+' /Root 1 0 R >>\nstartxref\n'+offset+'\n%%EOF';
   return Array.from(pdf,c=>c.charCodeAt(0));
 }
-
-const TDD_LUCIDE_ICONS=Object.freeze({
-  brain:[
-    'M12 18V5',
-    'M15 13a4.17 4.17 0 0 1-3-4 4.17 4.17 0 0 1-3 4',
-    'M17.598 6.5A3 3 0 1 0 12 5a3 3 0 1 0-5.598 1.5',
-    'M17.997 5.125a4 4 0 0 1 2.526 5.77',
-    'M18 18a4 4 0 0 0 2-7.464',
-    'M19.967 17.483A4 4 0 1 1 12 18a4 4 0 1 1-7.967-.517',
-    'M6 18a4 4 0 0 1-2-7.464',
-    'M6.003 5.125a4 4 0 0 0-2.526 5.77'
-  ],
-  ear:[
-    'M6 8.5a6.5 6.5 0 1 1 13 0c0 6-6 6-6 10a3.5 3.5 0 1 1-7 0',
-    'M15 8.5a2.5 2.5 0 0 0-5 0v1a2 2 0 1 1 0 4'
-  ]
-});
 
 function buildIntegratedPdf_(d,preview=false){
   const W=595.28,H=841.89,M=34,CW=W-2*M;
@@ -139,59 +124,23 @@ function buildIntegratedPdf_(d,preview=false){
   function dot(x,y,r,fill,strokeColor=null){vector('<circle cx="'+x+'" cy="'+y+'" r="'+r+'" fill="'+fill+'"'+(strokeColor?' stroke="'+strokeColor+'" stroke-width="1"':'')+'/>');const k=.55228475*r,a=H-y;out.push(color(fill)+' rg '+(strokeColor?color(strokeColor)+' RG 1 w ':'')+`${num(x+r)} ${num(a)} m ${num(x+r)} ${num(a+k)} ${num(x+k)} ${num(a+r)} ${num(x)} ${num(a+r)} c ${num(x-k)} ${num(a+r)} ${num(x-r)} ${num(a+k)} ${num(x-r)} ${num(a)} c ${num(x-r)} ${num(a-k)} ${num(x-k)} ${num(a-r)} ${num(x)} ${num(a-r)} c ${num(x+k)} ${num(a-r)} ${num(x+r)} ${num(a-k)} ${num(x+r)} ${num(a)} c `+(strokeColor?'B':'f'));}
   function triangle(points,fill){vector('<polygon points="'+points.map(p=>p.join(',')).join(' ')+'" fill="'+fill+'"/>');out.push(color(fill)+' rg '+num(points[0][0])+' '+num(H-points[0][1])+' m '+points.slice(1).map(p=>num(p[0])+' '+num(H-p[1])+' l').join(' ')+' h f');}
   function arrow(x1,y1,x2,y2,fill,w=2,dash=false){stroke(x1,y1,x2,y2,fill,w,dash);const a=Math.atan2(y2-y1,x2-x1),len=7+w,spread=4+w*.5;triangle([[x2,y2],[x2-len*Math.cos(a)+spread*Math.sin(a),y2-len*Math.sin(a)-spread*Math.cos(a)],[x2-len*Math.cos(a)-spread*Math.sin(a),y2-len*Math.sin(a)+spread*Math.cos(a)]],fill);}
+  function brainImage(x,y,w,h){vector('<image data-illustration="brain-ears" href="./cerebro-oidos.jpg?v=1.11" x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" preserveAspectRatio="xMidYMid meet"/>');out.push('q '+num(w)+' 0 0 '+num(h)+' '+num(x)+' '+num(H-y-h)+' cm /Brain Do Q');}
   function wrap(s,max,size=10,bold=false){const lines=[];String(s||'').split(/\r?\n/).forEach(p=>{let cur='';p.split(/\s+/).filter(Boolean).forEach(word=>{if(cur&&width(cur+' '+word,size,bold)>max){lines.push(cur);cur=word;}else cur+=(cur?' ':'')+word;});if(cur)lines.push(cur);});return lines;}
   const fmt=(v,dec=1)=>v===null||v===undefined||!isFinite(v)?'—':Number(v).toFixed(dec).replace('.',',');
   const signed=v=>v===null||v===undefined||!isFinite(v)?'—':(v>0?'+':'')+fmt(v);
-  function arcCubics(x1,y1,rx,ry,rotation,largeArc,sweep,x2,y2){
-    rx=Math.abs(rx);ry=Math.abs(ry);if(!rx||!ry||(x1===x2&&y1===y2))return [];
-    const phi=rotation*Math.PI/180,cp=Math.cos(phi),sp=Math.sin(phi),dx=(x1-x2)/2,dy=(y1-y2)/2;
-    const x1p=cp*dx+sp*dy,y1p=-sp*dx+cp*dy;let radii=x1p*x1p/(rx*rx)+y1p*y1p/(ry*ry);
-    if(radii>1){const scale=Math.sqrt(radii);rx*=scale;ry*=scale;}
-    const rx2=rx*rx,ry2=ry*ry,xp2=x1p*x1p,yp2=y1p*y1p,den=rx2*yp2+ry2*xp2;
-    const sign=largeArc===sweep?-1:1,coef=sign*Math.sqrt(Math.max(0,(rx2*ry2-rx2*yp2-ry2*xp2)/(den||1)));
-    const cxp=coef*rx*y1p/ry,cyp=-coef*ry*x1p/rx,cx=cp*cxp-sp*cyp+(x1+x2)/2,cy=sp*cxp+cp*cyp+(y1+y2)/2;
-    const theta1=Math.atan2((y1p-cyp)/ry,(x1p-cxp)/rx),theta2=Math.atan2((-y1p-cyp)/ry,(-x1p-cxp)/rx);let delta=theta2-theta1;
-    if(!sweep&&delta>0)delta-=Math.PI*2;if(sweep&&delta<0)delta+=Math.PI*2;
-    const count=Math.max(1,Math.ceil(Math.abs(delta)/(Math.PI/2))),step=delta/count,segments=[];
-    const point=t=>[cx+rx*cp*Math.cos(t)-ry*sp*Math.sin(t),cy+rx*sp*Math.cos(t)+ry*cp*Math.sin(t)];
-    const tangent=t=>[-rx*cp*Math.sin(t)-ry*sp*Math.cos(t),-rx*sp*Math.sin(t)+ry*cp*Math.cos(t)];
-    for(let i=0;i<count;i++){const a=theta1+i*step,b=a+step,k=4/3*Math.tan((b-a)/4),p1=point(a),p2=point(b),t1=tangent(a),t2=tangent(b);segments.push([p1[0]+k*t1[0],p1[1]+k*t1[1],p2[0]-k*t2[0],p2[1]-k*t2[1],p2[0],p2[1]]);}
-    return segments;
-  }
-  function pdfIconPath(d,x,y,size,mirror){
-    const tokens=d.match(/[AaCcHhLlMmVvZz]|[-+]?(?:\d*\.)?\d+(?:e[-+]?\d+)?/gi)||[],isCommand=t=>/^[A-Za-z]$/.test(t),scale=size/24;
-    const tx=v=>x+(mirror?24-v:v)*scale,ty=v=>H-(y+v*scale),point=(px,py)=>num(tx(px))+' '+num(ty(py));
-    let i=0,command='',px=0,py=0,sx=0,sy=0,path='';
-    while(i<tokens.length){if(isCommand(tokens[i]))command=tokens[i++];const relative=command===command.toLowerCase(),op=command.toUpperCase();
-      if(op==='M'){let nx=+tokens[i++],ny=+tokens[i++];if(relative){nx+=px;ny+=py;}px=nx;py=ny;sx=px;sy=py;path+=point(px,py)+' m ';command=relative?'l':'L';}
-      else if(op==='L'){let nx=+tokens[i++],ny=+tokens[i++];if(relative){nx+=px;ny+=py;}px=nx;py=ny;path+=point(px,py)+' l ';}
-      else if(op==='H'){let nx=+tokens[i++];if(relative)nx+=px;px=nx;path+=point(px,py)+' l ';}
-      else if(op==='V'){let ny=+tokens[i++];if(relative)ny+=py;py=ny;path+=point(px,py)+' l ';}
-      else if(op==='C'){let x1=+tokens[i++],y1=+tokens[i++],x2=+tokens[i++],y2=+tokens[i++],nx=+tokens[i++],ny=+tokens[i++];if(relative){x1+=px;y1+=py;x2+=px;y2+=py;nx+=px;ny+=py;}path+=point(x1,y1)+' '+point(x2,y2)+' '+point(nx,ny)+' c ';px=nx;py=ny;}
-      else if(op==='A'){const rx=+tokens[i++],ry=+tokens[i++],rotation=+tokens[i++],large=+tokens[i++]!==0,sweep=+tokens[i++]!==0;let nx=+tokens[i++],ny=+tokens[i++];if(relative){nx+=px;ny+=py;}const curves=arcCubics(px,py,rx,ry,rotation,large,sweep,nx,ny);if(!curves.length)path+=point(nx,ny)+' l ';else curves.forEach(c=>{path+=point(c[0],c[1])+' '+point(c[2],c[3])+' '+point(c[4],c[5])+' c ';});px=nx;py=ny;}
-      else if(op==='Z'){px=sx;py=sy;path+='h ';command='';}
-      else throw new Error('Comando SVG no compatible: '+command);
-    }
-    return path;
-  }
-  function lucideIcon(name,x,y,size,strokeColor,mirror=false,strokeWidth=1.8){
-    const paths=TDD_LUCIDE_ICONS[name];if(!paths)throw new Error('Icono Lucide no encontrado: '+name);
-    const scale=size/24,transform=mirror?'translate('+(x+size)+' '+y+') scale('+(-scale)+' '+scale+')':'translate('+x+' '+y+') scale('+scale+')';
-    vector('<g data-icon="'+name+'" transform="'+transform+'" fill="none" stroke="'+strokeColor+'" stroke-width="'+strokeWidth+'" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke" aria-hidden="true">'+paths.map(d=>'<path d="'+d+'" vector-effect="non-scaling-stroke"/>').join('')+'</g>');
-    paths.forEach(d=>out.push(color(strokeColor)+' RG '+num(strokeWidth)+' w 1 J 1 j '+pdfIconPath(d,x,y,size,mirror)+'S'));
-  }
+  const participantName=d.name||(d.isExample?'CASO DE EJEMPLO · ANÓNIMO':'Sin identificar');
   function header(label){const logoW=65,logoH=logoW*PDF_LOGO.height/PDF_LOGO.width;if(branded){vector('<image href="./logo-clinica-barajas.png" x="'+M+'" y="18" width="'+logoW+'" height="'+logoH+'"/>');out.push('q '+num(logoW)+' 0 0 '+num(logoH)+' '+num(M)+' '+num(H-18-logoH)+' cm /Logo Do Q');}else{text('TEST DE DÍGITOS DICÓTICOS',M,46,9,true,accent);}text('INFORME AUDIOLÓGICO',W-M,38,8,true,muted,'right');text(label,W-M,54,10,true,ink,'right');}
   function footer(page){stroke(M,799,W-M,799);text(branded?'CLÍNICA BARAJAS':'ESCUCHA DICÓTICA',M,815,8,true);text('Informe 04  ·  '+(d.date||'Sin fecha')+'  ·  '+APP_VERSION+'  ·  '+page+'/2',W-M,815,8,false,muted,'right');}
   function brainPanel(x,y,w,h,title,attended,mGain,mSuppress,focus){
     rect(x,y,w,h,'#f8fafb',line);text(title,x+13,y+20,11,true);text('MODULACIÓN SOSTENIDA',x+w-13,y+20,6.8,true,muted,'right');
-    const cx=x+w/2,lx=x+48,rx=x+w-48,ey=y+121;lucideIcon('brain',cx-27,y+36,54,ink,false,1.9);
+    const cx=x+w/2,lx=x+48,rx=x+w-48,ih=96,iw=ih*BRAIN_IMAGE.width/BRAIN_IMAGE.height,ix=cx-iw/2,iy=y+29,earY=iy+ih*.63,leftEar=ix+iw*.08,rightEar=ix+iw*.92;
+    rect(ix-5,iy-3,iw+10,ih+6,white,line,.5);brainImage(ix,iy,iw,ih);
     const targetX=attended==='OD'?rx:lx,targetColor=attended==='OD'?od:oi,otherX=attended==='OD'?lx:rx,otherColor=attended==='OD'?oi:od;
-    const targetEndX=targetX+(attended==='OD'?-23:23),otherEndX=otherX+(attended==='OD'?23:-23);
-    arrow(cx+(attended==='OD'?13:-13),y+77,targetEndX,ey-15,targetColor,Math.min(4.2,1.5+Math.abs(mGain.index||0)/32));arrow(cx+(attended==='OD'?-13:13),y+77,otherEndX,ey-15,otherColor,1.2,true);
-    rect(lx-21,ey-21,42,42,'#f1f6fd',oi,.8);rect(rx-21,ey-21,42,42,'#fdf2f2',od,.8);lucideIcon('ear',lx-14,ey-14,28,oi,true,1.8);lucideIcon('ear',rx-14,ey-14,28,od,false,1.8);
-    text(attended==='OI'?'OI · FOCO':'OI · COMPETIDOR',lx,ey+31,7.1,true,attended==='OI'?oi:muted,'center');text(attended==='OD'?'OD · FOCO':'OD · COMPETIDOR',rx,ey+31,7.1,true,attended==='OD'?od:muted,'center');
-    text('LB '+fmt(mGain.base)+' / AF '+fmt(mGain.focused),targetX,ey+44,7.4,true,targetColor,'center');text('Aciertos '+signed(mGain.delta)+' pp',targetX,ey+56,7.4,true,targetColor,'center');
-    text('LB '+fmt(mSuppress.base)+' / AF '+fmt(mSuppress.focused),otherX,ey+44,7.4,true,otherColor,'center');text('Intrusiones '+signed(-mSuppress.delta)+' pp',otherX,ey+56,7.4,true,otherColor,'center');
+    const targetEar=attended==='OD'?rightEar:leftEar,otherEar=attended==='OD'?leftEar:rightEar;
+    arrow(cx+(attended==='OD'?8:-8),iy+ih*.31,targetEar,earY,targetColor,Math.min(4,1.5+Math.abs(mGain.index||0)/34));arrow(cx+(attended==='OD'?-8:8),iy+ih*.31,otherEar,earY,otherColor,1.15,true);dot(leftEar,earY,3,white,oi);dot(rightEar,earY,3,white,od);
+    const ey=y+136;text(attended==='OI'?'OI · FOCO':'OI · COMPETIDOR',lx,ey,7.1,true,attended==='OI'?oi:muted,'center');text(attended==='OD'?'OD · FOCO':'OD · COMPETIDOR',rx,ey,7.1,true,attended==='OD'?od:muted,'center');
+    text('LB '+fmt(mGain.base)+' / AF '+fmt(mGain.focused),targetX,ey+13,7.4,true,targetColor,'center');text('Aciertos '+signed(mGain.delta)+' pp',targetX,ey+25,7.4,true,targetColor,'center');
+    text('LB '+fmt(mSuppress.base)+' / AF '+fmt(mSuppress.focused),otherX,ey+13,7.4,true,otherColor,'center');text('Intrusiones '+signed(-mSuppress.delta)+' pp',otherX,ey+25,7.4,true,otherColor,'center');
     rect(x+13,y+h-28,w-26,18,white);text('Selectividad acierto - intrusión: '+signed(focus.selectivity)+' pp',x+w/2,y+h-15,7.8,true,ink,'center');
   }
   function loadPanel(x,y,w,h,title,facKey,supKey,facColor,supColor){
@@ -201,7 +150,7 @@ function buildIntegratedPdf_(d,preview=false){
   }
   const byKey=Object.fromEntries(d.measures.map(m=>[m.key,m]));
   header('TDD / INFORME 04');text('Perfil integrado de modulación',branded?M+86:M,82,23,true);text('Atención dividida y focalizada por oído',branded?M+86:M,102,10,false,muted);rect(M,126,CW,2,accent);
-  rect(M,143,CW,58,soft);text('PARTICIPANTE',M+12,158,7.2,true,muted);text(d.name||'Sin identificar',M+12,177,12,true);text('ID: '+(d.patient||'—')+'  ·  Edad: '+(d.age===null?'No consta':d.age+' años')+'  ·  Lateralidad: '+(d.hand||'No consta'),M+12,192,8,false,muted);text('FECHA',W-M-112,158,7.2,true,muted);text(d.date||'No consta',W-M-112,177,10,true);text(d.intensity===null?'Intensidad no consignada':d.intensity+' dB nHL · OD/OI',W-M-112,192,7.5,false,muted);
+  rect(M,143,CW,58,soft);text('PARTICIPANTE',M+12,158,7.2,true,muted);text(participantName,M+12,177,12,true);text('ID: '+(d.patient||'—')+'  ·  Edad: '+(d.age===null?'No consta':d.age+' años')+'  ·  Lateralidad: '+(d.hand||'No consta'),M+12,192,8,false,muted);text('FECHA',W-M-112,158,7.2,true,muted);text(d.date||'No consta',W-M-112,177,10,true);text(d.intensity===null?'Intensidad no consignada':d.intensity+' dB nHL · OD/OI',W-M-112,192,7.5,false,muted);
   const conditionCards=[['01 · ATENCIÓN DIVIDIDA','OD '+fmt(d.baseline.od)+' %  ·  OI '+fmt(d.baseline.oi)+' %','IL '+signed(d.baseline.il),accent],['02 · FOCO OD','Aciertos OD '+fmt(d.focusRight.hit)+' %','Intrusiones OI '+fmt(d.focusRight.intrusion)+' %',od],['03 · FOCO OI','Aciertos OI '+fmt(d.focusLeft.hit)+' %','Intrusiones OD '+fmt(d.focusLeft.intrusion)+' %',oi]];
   conditionCards.forEach((c,i)=>{const gap=9,w=(CW-gap*2)/3,x=M+i*(w+gap);rect(x,218,w,73,'#f8fafb',line);rect(x,218,w,3,c[3]);text(c[0],x+11,237,7.2,true,muted);text(c[1],x+11,258,10,true,c[3]);text(c[2],x+11,277,8.4,false,ink);});
   text('01',M,318,9,true,accent);text('Cambio respecto a la línea base',M+23,318,14,true);text('Puntos porcentuales e índice simétrico de Gadea-Doménech',M,335,8.2,false,muted);
@@ -222,7 +171,8 @@ function buildIntegratedPdf_(d,preview=false){
   if(preview)return svg.map((lines,i)=>'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+W+' '+H+'" font-family="Arial,Helvetica,sans-serif" role="img" aria-label="Informe 04, página '+(i+1)+'"><rect width="'+W+'" height="'+H+'" fill="white"/>'+lines.join('')+'</svg>').join('');
   const objects=['<< /Type /Catalog /Pages 2 0 R >>','', '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>','<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>'];
   if(branded){const mask=PDF_LOGO.alpha+'>',rgb=PDF_LOGO.rgb+'>';objects.push('<< /Type /XObject /Subtype /Image /Width '+PDF_LOGO.width+' /Height '+PDF_LOGO.height+' /ColorSpace /DeviceGray /BitsPerComponent 8 /Filter [/ASCIIHexDecode /FlateDecode] /Length '+mask.length+' >>\nstream\n'+mask+'\nendstream');objects.push('<< /Type /XObject /Subtype /Image /Width '+PDF_LOGO.width+' /Height '+PDF_LOGO.height+' /ColorSpace /DeviceRGB /BitsPerComponent 8 /SMask 5 0 R /Filter [/ASCIIHexDecode /FlateDecode] /Length '+rgb.length+' >>\nstream\n'+rgb+'\nendstream');}
-  const kids=[];pages.forEach(p=>{const pageId=objects.length+1,streamId=pageId+1,stream=p.join('\n');kids.push(pageId+' 0 R');const xObject=branded?' /XObject << /Logo 6 0 R >>':'';objects.push('<< /Type /Page /Parent 2 0 R /MediaBox [0 0 '+W+' '+H+'] /Resources << /Font << /F1 3 0 R /F2 4 0 R >>'+xObject+' >> /Contents '+streamId+' 0 R >>');objects.push('<< /Length '+stream.length+' >>\nstream\n'+stream+'\nendstream');});objects[1]='<< /Type /Pages /Kids ['+kids.join(' ')+'] /Count '+pages.length+' >>';
+  const brainJpeg=atob(BRAIN_IMAGE.base64),brainId=objects.length+1,brainSpace=BRAIN_IMAGE.components===1?'/DeviceGray':'/DeviceRGB';objects.push('<< /Type /XObject /Subtype /Image /Width '+BRAIN_IMAGE.width+' /Height '+BRAIN_IMAGE.height+' /ColorSpace '+brainSpace+' /BitsPerComponent 8 /Filter /DCTDecode /Length '+brainJpeg.length+' >>\nstream\n'+brainJpeg+'\nendstream');
+  const kids=[];pages.forEach(p=>{const pageId=objects.length+1,streamId=pageId+1,stream=p.join('\n');kids.push(pageId+' 0 R');const xObject=' /XObject << '+(branded?'/Logo 6 0 R ':'')+'/Brain '+brainId+' 0 R >>';objects.push('<< /Type /Page /Parent 2 0 R /MediaBox [0 0 '+W+' '+H+'] /Resources << /Font << /F1 3 0 R /F2 4 0 R >>'+xObject+' >> /Contents '+streamId+' 0 R >>');objects.push('<< /Length '+stream.length+' >>\nstream\n'+stream+'\nendstream');});objects[1]='<< /Type /Pages /Kids ['+kids.join(' ')+'] /Count '+pages.length+' >>';
   let pdf='%PDF-1.4\n',offsets=[0];objects.forEach((s,i)=>{offsets.push(pdf.length);pdf+=(i+1)+' 0 obj\n'+s+'\nendobj\n';});const offset=pdf.length;pdf+='xref\n0 '+(objects.length+1)+'\n0000000000 65535 f \n'+offsets.slice(1).map(o=>String(o).padStart(10,'0')+' 00000 n \n').join('')+'trailer\n<< /Size '+(objects.length+1)+' /Root 1 0 R >>\nstartxref\n'+offset+'\n%%EOF';return Array.from(pdf,c=>c.charCodeAt(0));
 }
 

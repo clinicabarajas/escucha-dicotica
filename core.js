@@ -1,5 +1,5 @@
-import { TEST_LISTS } from './data.js?v=1.10';
-import { clinicalAge_ } from './report.js?v=1.10';
+import { TEST_LISTS } from './data.js?v=1.11';
+import { clinicalAge_ } from './report.js?v=1.11';
 
 export const MODES = ['Atención dividida','Atención focalizada - oído derecho','Atención focalizada - oído izquierdo'];
 
@@ -22,13 +22,14 @@ export function today() {
 }
 export function blankSession() {
   return {
-    participant:{name:'',patient:'',birth:'',exam:today(),hand:'',examiner:'',notes:'',neutralReport:false},
+    participant:{name:'',patient:'',birth:'',exam:today(),hand:'',examiner:'',notes:'',neutralReport:false,isExample:false},
     lists:Object.fromEntries([1,2,3].map(n=>[n,{mode:MODES[n-1],odDb:'',oiDb:'',otherErrors:'',complete:false,scores:Array.from({length:81},()=>[false,false])}]))
   };
 }
 export function exampleSession() {
   const session=blankSession();
   const examYear=Number(session.participant.exam.slice(0,4));
+  session.participant.isExample=true;
   session.participant.birth=`${examYear-EXAMPLE_PROFILE.age}-01-01`;
   session.participant.hand=EXAMPLE_PROFILE.hand;
   for(const n of [1,2,3]){
@@ -59,7 +60,7 @@ export function calculate(listNumber, list, participant) {
   return {
     list:Number(listNumber),name:participant.name.trim(),patient:participant.patient.trim(),age:birth?clinicalAge_(birth,exam):null,
     date:`${String(exam.getDate()).padStart(2,'0')}/${String(exam.getMonth()+1).padStart(2,'0')}/${exam.getFullYear()}`,
-    examiner:participant.examiner.trim(),hand:participant.hand,notes:participant.notes.trim(),neutralReport:Boolean(participant.neutralReport),mode:list.mode,odDb:list.odDb,oiDb:list.oiDb,otherErrors:list.otherErrors===''?null:Number(list.otherErrors),
+    examiner:participant.examiner.trim(),hand:participant.hand,notes:participant.notes.trim(),neutralReport:Boolean(participant.neutralReport),isExample:Boolean(participant.isExample),mode:list.mode,odDb:list.odDb,oiDb:list.oiDb,otherErrors:list.otherErrors===''?null:Number(list.otherErrors),
     completed:list.complete?100:0,totals:total,
     difficulty:[1,2,3].map(n=>measure('Par '+n,r=>r[1]===n)),
     pairs:pairs.map(([n,pos])=>measure('Par '+n+(n>1?'-'+pos[0]:''),r=>r[1]===n&&pos.includes(r[2]))),
@@ -103,7 +104,7 @@ export function calculateIntegrated(session) {
   }));
   return {
     name:lists[1].name,patient:lists[1].patient,age:lists[1].age,date:lists[1].date,examiner:lists[1].examiner,hand:lists[1].hand,notes:lists[1].notes,
-    neutralReport:lists[1].neutralReport,intensity:readiness.intensity,quality:readiness.reason,lists,measures,load,
+    neutralReport:lists[1].neutralReport,isExample:lists[1].isExample,intensity:readiness.intensity,quality:readiness.reason,lists,measures,load,
     baseline:{od:baseline[0],oi:baseline[1],mean:baseline[2],il:baseline[3]},
     focusRight:{hit:focusRight[0],intrusion:focusRight[1],selectivity:focusRight[0]-focusRight[1],omissions:100-focusRight[0]},
     focusLeft:{hit:focusLeft[1],intrusion:focusLeft[0],selectivity:focusLeft[1]-focusLeft[0],omissions:100-focusLeft[1]},
