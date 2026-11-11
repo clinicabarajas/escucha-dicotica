@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Plantilla de puntuación del Test de Dígitos Dicóticos. Informes PDF por lista, sin enviar ni almacenar los datos de la evaluación.">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; frame-src blob:; object-src blob:; base-uri 'none'; form-action 'none'">
+  <meta name="referrer" content="no-referrer">
+  <title>Escucha dicótica · Clínica Barajas</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./style.css">
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <a href="#evaluation" class="skip">Ir a la evaluación</a>
+  <header class="topbar">
+    <a class="identity" href="./" aria-label="Escucha dicótica, inicio"><img src="./logo-clinica-barajas.png" alt="Clínica Barajas" width="49" height="61"><span>CLÍNICA BARAJAS<small>Audiología · Herramientas clínicas</small></span></a>
+    <div class="header-actions"><span class="privacy-pill"><span aria-hidden="true">●</span> Solo en esta pestaña</span><button id="reset" class="button quiet" type="button">Nueva evaluación</button></div>
+  </header>
+
+  <main id="evaluation" class="shell">
+    <section class="intro" aria-labelledby="title">
+      <div><p class="eyebrow">TEST DE DÍGITOS DICÓTICOS</p><h1 id="title">Escucha dicótica<span>.</span></h1><p class="lead">De las respuestas a un informe claro.</p></div>
+      <p class="intro-note">Puntúa cada lista de forma independiente.<br>El informe se genera en tu navegador.</p>
+    </section>
+
+    <form id="evaluationForm" autocomplete="off">
+      <details class="participant panel" open>
+        <summary><span><span class="step">01</span> Datos de la evaluación</span><span class="optional">Identificación opcional</span></summary>
+        <div class="participant-fields">
+          <label class="span2">Nombre o código del participante<input id="name" type="text" maxlength="64" placeholder="Puedes utilizar un código anónimo" autocomplete="off"></label>
+          <label>Fecha de nacimiento<input id="birth" type="date" aria-describedby="birthHint"></label>
+          <label>Fecha del examen<input id="exam" type="date" required></label>
+          <label>Identificador<input id="patient" type="text" maxlength="24" placeholder="Opcional" autocomplete="off"></label>
+          <label>Lateralidad manual<select id="hand"><option value="">No consta</option><option>Diestro</option><option>Siniestro</option><option>Ambidiestro</option></select></label>
+          <label class="span2">Examinador<input id="examiner" type="text" maxlength="70" placeholder="Opcional" autocomplete="off"></label>
+          <p id="birthHint" class="hint full">La fecha de nacimiento permite calcular la edad y mostrar la referencia en atención dividida. Los datos no se guardan.</p>
+        </div>
+      </details>
+
+      <div class="workspace">
+        <div class="entry">
+          <section class="panel scoring" aria-labelledby="scoringTitle">
+            <div class="section-heading"><h2 id="scoringTitle"><span class="step">02</span> Respuestas</h2><span class="muted">27 ítems por lista</span></div>
+            <div class="list-tabs" role="group" aria-label="Lista que se está puntuando">
+              <button type="button" data-list="1" aria-pressed="true">Lista 1<span>Atención dividida</span></button>
+              <button type="button" data-list="2" aria-pressed="false">Lista 2<span>Focalizada · OD</span></button>
+              <button type="button" data-list="3" aria-pressed="false">Lista 3<span>Focalizada · OI</span></button>
+            </div>
+            <div class="conditions">
+              <label class="full">Modalidad atencional<select id="mode"><option>Atención dividida</option><option>Atención focalizada - oído derecho</option><option>Atención focalizada - oído izquierdo</option></select></label>
+              <label>Intensidad OD <span class="unit">dB nHL</span><input id="odDb" type="number" min="0" max="120" step="1" placeholder="No consta"></label>
+              <label>Intensidad OI <span class="unit">dB nHL</span><input id="oiDb" type="number" min="0" max="120" step="1" placeholder="No consta"></label>
+            </div>
+            <p id="instruction" class="instruction"></p>
+            <div class="score-help"><p><b>Marca los dígitos reconocidos.</b> Al calcular el informe, los dígitos sin marcar se contarán como 0.</p><div class="ear-key"><span class="od-key">OD · derecho</span><span class="oi-key">OI · izquierdo</span></div></div>
+            <div id="items" class="items"></div>
+            <div class="score-bottom"><span id="markedCount" class="hint"></span><button id="clearList" class="button quiet" type="button">Vaciar esta lista</button></div>
+          </section>
+          <section class="panel notes"><label for="notes">Observaciones para el informe</label><textarea id="notes" maxlength="4000" rows="3" placeholder="Condiciones de administración, incidencias o contexto clínico…" autocomplete="off"></textarea><p class="hint">Comunes a los informes de esta evaluación.</p></section>
+        </div>
+
+        <aside class="results panel" aria-labelledby="resultTitle">
+          <div class="section-heading"><h2 id="resultTitle"><span class="step">03</span> Tu informe</h2><span id="reportList" class="report-list">LISTA 1</span></div>
+          <div class="report-symbol" aria-hidden="true"><svg viewBox="0 0 76 88"><rect x="13" y="3" width="51" height="75" rx="5" fill="white" stroke="currentColor" stroke-width="1.5"/><path d="M24 19h29M24 25h18M24 58h29M24 65h21" fill="none" stroke="currentColor" stroke-width="2"/><path d="m24 47 8-9 8 5 13-14" fill="none" stroke="#087f8c" stroke-width="3"/><circle cx="53" cy="29" r="3" fill="#087f8c"/></svg></div>
+          <p class="result-description">Un informe, una lista.<br><span>A4 vertical · Listo para imprimir</span></p>
+          <div class="result-stats"><div><span id="odLabel">Aciertos OD</span><strong id="odTotal">—</strong></div><div class="oi-stat"><span id="oiLabel">Aciertos OI</span><strong id="oiTotal">—</strong></div></div>
+          <p id="normStatus" class="norm-status">Añade la fecha de nacimiento para disponer de la referencia por edad.</p>
+          <button id="calculate" type="button" class="button primary">Calcular informe de Lista 1 <span aria-hidden="true">→</span></button>
+          <div class="pdf-actions"><button id="preview" class="button secondary" type="button" disabled>Ver informe</button><button id="download" class="button secondary" type="button" disabled>Descargar PDF</button></div>
+          <p id="status" class="status" role="status" aria-live="polite">Revisa los 27 ítems antes de calcular.</p>
+          <div class="privacy-note"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 10h14v10H5zM8 10V7a4 4 0 0 1 8 0v3"/></svg><p>Sin cuenta y sin historial. Las respuestas permanecen en esta pestaña. Solo se conserva el PDF que descargues.</p></div>
+        </aside>
+      </div>
+    </form>
+
+    <section class="reference panel" id="reference">
+      <details><summary>Referencia científica y alcance de los resultados</summary><div class="detail-content"><p><b>Zenker Castro F, Suárez Suárez M, Marro Cosialls S, Barajas de Prat JJ.</b> La evaluación del procesamiento auditivo central: el test de dígitos dicóticos. <i>Revista de Logopedia, Foniatría y Audiología.</i> 2007;27(2):74–85. <a href="https://doi.org/10.1016/S0214-4603(07)70076-1" target="_blank" rel="noopener noreferrer">Consultar artículo ↗</a></p><p>La comparación utiliza las medias y desviaciones típicas de la tabla 1, por grupo de edad, oído y dificultad. <b>Los percentiles son estimaciones bajo una distribución normal</b>, no percentiles empíricos ni puntos de corte diagnósticos. La banda del gráfico representa media ± 1 DT.</p><p>La muestra de referencia era diestra y se evaluó en atención dividida a 65 dB nHL. No se aplica la referencia a atención focalizada, ni automáticamente a lateralidad siniestra o ambidiestra. No se extrapola fuera de 6–72 años; no se asigna grupo a los 60 años porque ese límite no queda definido expresamente en la tabla. La media bilateral y el índice de lateralidad no reciben percentiles.</p><p>Esta plantilla puntúa respuestas previamente obtenidas: no incluye audio ni administra la prueba.</p></div></details>
+      <details><summary>Qué ocurre con los datos</summary><div class="detail-content"><p>El cálculo y la creación del PDF se realizan en tu dispositivo. La aplicación no envía los campos ni las respuestas a un servidor y no utiliza cookies, almacenamiento local, bases de datos ni analítica. Recargar, cerrar o iniciar una nueva evaluación elimina los datos de esta sesión.</p><p>La descarga guarda el PDF en tu dispositivo, según la configuración de tu navegador. GitHub Pages, como proveedor de alojamiento, puede registrar datos técnicos de visita —como la dirección IP—, pero esta aplicación no le envía los datos de la evaluación. <a href="https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages#data-collection" target="_blank" rel="noopener noreferrer">Información del alojamiento ↗</a></p></div></details>
+    </section>
+  </main>
+  <footer class="site-footer"><span>Clínica Barajas · Escucha dicótica</span><span>Referencia: Zenker Castro et al., 2007</span></footer>
+
+  <dialog id="confirmDialog" aria-labelledby="confirmTitle"><div class="dialog-body"><p class="eyebrow">REVISIÓN DE LA LISTA</p><h2 id="confirmTitle">¿Has revisado todos los ítems?</h2><p id="confirmText"></p><div class="dialog-actions"><button type="button" id="cancelConfirm" class="button secondary">Volver a revisar</button><button type="button" id="acceptConfirm" class="button primary">Sí, calcular informe</button></div></div></dialog>
+  <dialog id="resetDialog" aria-labelledby="resetTitle"><div class="dialog-body"><h2 id="resetTitle">¿Iniciar otra evaluación?</h2><p>Se eliminarán de esta pestaña los datos y las respuestas de las tres listas. Descarga antes los informes que necesites.</p><div class="dialog-actions"><button type="button" id="cancelReset" class="button secondary">Cancelar</button><button type="button" id="acceptReset" class="button primary">Borrar y empezar</button></div></div></dialog>
+  <dialog id="clearDialog" aria-labelledby="clearTitle"><div class="dialog-body"><h2 id="clearTitle">¿Vaciar esta lista?</h2><p>Se eliminarán solo las respuestas de la lista seleccionada. Los datos y las otras listas se conservarán en esta pestaña.</p><div class="dialog-actions"><button type="button" id="cancelClear" class="button secondary">Cancelar</button><button type="button" id="acceptClear" class="button primary">Vaciar lista</button></div></div></dialog>
+  <dialog id="pdfDialog" class="pdf-dialog" aria-labelledby="pdfTitle"><div class="pdf-toolbar"><h2 id="pdfTitle">Informe de Lista 1</h2><div><button id="dialogDownload" type="button" class="button primary">Descargar PDF</button><button id="closePreview" type="button" class="button quiet" aria-label="Cerrar vista del informe">Cerrar ×</button></div></div><div id="pdfPreview" class="pdf-preview" aria-label="Vista previa del informe"></div><p class="hint">Vista previa del informe. Descarga el PDF para imprimirlo a tamaño A4.</p></dialog>
+  <noscript><div class="noscript">Esta herramienta necesita JavaScript para calcular el informe en tu navegador.</div></noscript>
+</body>
+</html>

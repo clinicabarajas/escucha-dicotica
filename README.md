@@ -1,0 +1,43 @@
+# Escucha dicótica · Clínica Barajas
+
+Plantilla web del Test de Dígitos Dicóticos (TDD). Introduce las respuestas de cualquiera de las tres listas y descarga un informe PDF A4 vertical. Incluye el logotipo de Clínica Barajas y referencia bibliográfica.
+
+[Abrir la aplicación](https://clinicabarajas.github.io/escucha-dicotica/)
+
+## Uso
+
+1. Introduce los datos de la evaluación; la identificación es opcional.
+2. Selecciona una lista y su modalidad. Marca los dígitos reconocidos. En atención focalizada, las marcas del oído no atendido son intrusiones.
+3. Pulsa **Calcular informe** y confirma que has revisado los 27 ítems. Los dígitos sin marcar cuentan como 0.
+4. Abre o descarga el PDF. Cada lista produce su propio informe; no es necesario realizar las tres.
+5. Pulsa **Nueva evaluación** para eliminar los datos de la sesión. Recargar o cerrar también los elimina.
+
+La herramienta puntúa respuestas obtenidas con el material de la prueba. No incluye audio ni administra estímulos.
+
+## Privacidad
+
+El cálculo y la generación del PDF se ejecutan íntegramente en el navegador. No hay servidor de datos, registro, base de datos, analítica, cookies de la aplicación, localStorage, sessionStorage ni IndexedDB. Los datos solo permanecen en memoria durante la sesión. La política CSP bloquea conexiones salientes y envío de formularios. Los archivos de la aplicación se cargan del mismo alojamiento, sin dependencias de CDN.
+
+El PDF descargado se conserva en el dispositivo del usuario. El alojamiento GitHub Pages registra datos técnicos de visita, como la IP, según su política; la aplicación no transmite las respuestas ni los datos del participante. Véase [GitHub Pages: recopilación de datos](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages#data-collection).
+
+El repositorio contiene únicamente código, plantillas vacías, valores de referencia publicados y el logo. No contiene evaluaciones, datos individuales de la muestra original ni credenciales.
+
+## Cálculo y referencia
+
+Cada lista contiene 81 dígitos por oído: 18, 27 y 36 en las tres dificultades. Los porcentajes globales y por dificultad, los pares solapados y las posiciones reproducen las fórmulas de la plantilla original. IL = (OD − OI) / (OD + OI) × 100; si ambas puntuaciones son cero, IL = 0. El IL solo se muestra en atención dividida.
+
+Referencia: Zenker Castro F, Suárez Suárez M, Marro Cosialls S, Barajas de Prat JJ. **La evaluación del procesamiento auditivo central: el test de dígitos dicóticos.** Revista de Logopedia, Foniatría y Audiología. 2007;27(2):74–85. [doi:10.1016/S0214-4603(07)70076-1](https://doi.org/10.1016/S0214-4603(07)70076-1).
+
+Se utilizan las medias y DT de la tabla 1 para atención dividida, por edad, oído y dificultad. z = (resultado − media) / DT. El percentil estimado es 100 × Φ(z), bajo aproximación normal, redondeado al entero, con extremos <1 y >99. **No son percentiles empíricos, no han sido validados como baremo independiente y no equivalen a un diagnóstico.** La banda representa media ±1 DT, no un punto de corte.
+
+La muestra publicada era diestra y se evaluó a 65 dB nHL. No se aplica esta referencia a atención focalizada ni automáticamente a personas siniestras o ambidiestras. Grupos de la tabla: 6–12, 13–17, 18–34, 35–59 y >60 años. No se extrapola fuera de 6–72 años ni se asigna baremo a los 60 años, límite no definido expresamente en la tabla. No hay percentiles de la media bilateral ni del índice IL.
+
+## Publicación y mantenimiento
+
+Aplicación estática sin instalación ni compilación. Publica los archivos de la raíz mediante **Settings → Pages → Deploy from a branch → main / (root)** en GitHub. No se necesitan claves ni secretos.
+
+Para revisar localmente, sirve esta carpeta con un servidor estático (por ejemplo, `python -m http.server 8765`) y abre `http://localhost:8765`. Los módulos no están pensados para abrir `index.html` directamente desde `file://`.
+
+Pruebas sin dependencias: `node --test core.test.js` (Node 20 o posterior). Verifican denominadores, independencia de listas, ceros, pares solapados, edad, límites normativos, percentiles, estructura PDF y ausencia de mecanismos de persistencia/envío.
+
+El logotipo pertenece a Clínica Barajas. La referencia bibliográfica se conserva en la web y en cada informe.
