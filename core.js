@@ -1,5 +1,5 @@
-import { TEST_LISTS } from './data.js?v=1.11';
-import { clinicalAge_ } from './report.js?v=1.11';
+import { TEST_LISTS } from './data.js?v=1.12';
+import { clinicalAge_ } from './report.js?v=1.12';
 
 export const MODES = ['Atención dividida','Atención focalizada - oído derecho','Atención focalizada - oído izquierdo'];
 
@@ -30,6 +30,7 @@ export function exampleSession() {
   const session=blankSession();
   const examYear=Number(session.participant.exam.slice(0,4));
   session.participant.isExample=true;
+  session.participant.name='CASO DE EJEMPLO · ANÓNIMO';
   session.participant.birth=`${examYear-EXAMPLE_PROFILE.age}-01-01`;
   session.participant.hand=EXAMPLE_PROFILE.hand;
   for(const n of [1,2,3]){

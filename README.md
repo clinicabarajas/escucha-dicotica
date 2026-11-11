@@ -1,4 +1,4 @@
-# Escucha dicótica · Clínica Barajas · V1.11
+# Escucha dicótica · Clínica Barajas · V1.12
 
 Plantilla web del Test de Dígitos Dicóticos (TDD). Introduce las respuestas de cualquiera de las tres listas y descarga informes PDF A4 verticales. Permite generar cada informe con identidad de Clínica Barajas o en formato neutro, sin logo ni mención institucional.
 
@@ -13,7 +13,7 @@ Plantilla web del Test de Dígitos Dicóticos (TDD). Introduce las respuestas de
 5. Al completar las tres modalidades previstas se activa el **Informe 04**, que integra línea base, facilitación, supresión de intrusiones, asimetría y efecto de carga.
 6. Pulsa **Nueva evaluación** para eliminar los datos de la sesión. Recargar o cerrar también los elimina.
 
-El botón **Cargar ejemplo** introduce un caso clínico anonimizado con las respuestas de las tres listas, edad en el TDD, lateralidad e intensidades. Las fechas son sintéticas y solo sirven para calcular la edad. No añade nombre, identificador, fechas reales, examinador ni observaciones, y no calcula los informes automáticamente.
+El botón **Cargar ejemplo** introduce un caso clínico anonimizado con las respuestas de las tres listas, edad en el TDD, lateralidad e intensidades. En la pantalla principal y en los informes se identifica exclusivamente como **CASO DE EJEMPLO · ANÓNIMO**. Las fechas son sintéticas y solo sirven para calcular la edad. No añade nombre real, identificador, fechas reales, examinador ni observaciones, y no calcula los informes automáticamente.
 
 La herramienta puntúa respuestas obtenidas con el material de la prueba. No incluye audio ni administra estímulos.
 
@@ -50,6 +50,14 @@ Pruebas sin dependencias: `node --test core.test.js` (Node 20 o posterior). Veri
 El logotipo pertenece a Clínica Barajas. La referencia bibliográfica se conserva en la web y en cada informe. Si se activa el formato neutro, el PDF no incorpora el logo ni menciones institucionales.
 
 La ilustración de cerebro y oídos del Informe 04 fue aportada expresamente para este proyecto y se integra en el PDF sin conexiones externas.
+
+## V1.12
+
+- Al cargar el ejemplo, el campo «Nombre o código del participante» muestra **CASO DE EJEMPLO · ANÓNIMO**.
+- La misma etiqueta se conserva en la vista previa y en todos los PDF del ejemplo.
+- El texto de privacidad aclara que la etiqueta es genérica y no contiene un nombre real.
+- El manual pasa a ser un bloque desplegable al mismo nivel que las referencias científicas y la privacidad.
+- Ampliada la interpretación del Informe 04 con fórmulas, patrones orientativos, efectos techo/suelo y una secuencia de integración clínica.
 
 ## V1.11
 

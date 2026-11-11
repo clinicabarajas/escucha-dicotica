@@ -1,6 +1,6 @@
-import { PDF_LOGO } from './logo-pdf.js?v=1.11';
-import { APP_VERSION } from './version.js?v=1.11';
-import { BRAIN_IMAGE } from './brain-image.js?v=1.11';
+import { PDF_LOGO } from './logo-pdf.js?v=1.12';
+import { APP_VERSION } from './version.js?v=1.12';
+import { BRAIN_IMAGE } from './brain-image.js?v=1.12';
 // Referencia descriptiva publicada: Zenker Castro et al., 2007, tabla 1, p. 78.
 // Percentiles estimados bajo distribución normal; no son percentiles empíricos publicados.
 const TDD_NORMS = [
@@ -124,7 +124,7 @@ function buildIntegratedPdf_(d,preview=false){
   function dot(x,y,r,fill,strokeColor=null){vector('<circle cx="'+x+'" cy="'+y+'" r="'+r+'" fill="'+fill+'"'+(strokeColor?' stroke="'+strokeColor+'" stroke-width="1"':'')+'/>');const k=.55228475*r,a=H-y;out.push(color(fill)+' rg '+(strokeColor?color(strokeColor)+' RG 1 w ':'')+`${num(x+r)} ${num(a)} m ${num(x+r)} ${num(a+k)} ${num(x+k)} ${num(a+r)} ${num(x)} ${num(a+r)} c ${num(x-k)} ${num(a+r)} ${num(x-r)} ${num(a+k)} ${num(x-r)} ${num(a)} c ${num(x-r)} ${num(a-k)} ${num(x-k)} ${num(a-r)} ${num(x)} ${num(a-r)} c ${num(x+k)} ${num(a-r)} ${num(x+r)} ${num(a-k)} ${num(x+r)} ${num(a)} c `+(strokeColor?'B':'f'));}
   function triangle(points,fill){vector('<polygon points="'+points.map(p=>p.join(',')).join(' ')+'" fill="'+fill+'"/>');out.push(color(fill)+' rg '+num(points[0][0])+' '+num(H-points[0][1])+' m '+points.slice(1).map(p=>num(p[0])+' '+num(H-p[1])+' l').join(' ')+' h f');}
   function arrow(x1,y1,x2,y2,fill,w=2,dash=false){stroke(x1,y1,x2,y2,fill,w,dash);const a=Math.atan2(y2-y1,x2-x1),len=7+w,spread=4+w*.5;triangle([[x2,y2],[x2-len*Math.cos(a)+spread*Math.sin(a),y2-len*Math.sin(a)-spread*Math.cos(a)],[x2-len*Math.cos(a)-spread*Math.sin(a),y2-len*Math.sin(a)+spread*Math.cos(a)]],fill);}
-  function brainImage(x,y,w,h){vector('<image data-illustration="brain-ears" href="./cerebro-oidos.jpg?v=1.11" x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" preserveAspectRatio="xMidYMid meet"/>');out.push('q '+num(w)+' 0 0 '+num(h)+' '+num(x)+' '+num(H-y-h)+' cm /Brain Do Q');}
+  function brainImage(x,y,w,h){vector('<image data-illustration="brain-ears" href="./cerebro-oidos.jpg?v=1.12" x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" preserveAspectRatio="xMidYMid meet"/>');out.push('q '+num(w)+' 0 0 '+num(h)+' '+num(x)+' '+num(H-y-h)+' cm /Brain Do Q');}
   function wrap(s,max,size=10,bold=false){const lines=[];String(s||'').split(/\r?\n/).forEach(p=>{let cur='';p.split(/\s+/).filter(Boolean).forEach(word=>{if(cur&&width(cur+' '+word,size,bold)>max){lines.push(cur);cur=word;}else cur+=(cur?' ':'')+word;});if(cur)lines.push(cur);});return lines;}
   const fmt=(v,dec=1)=>v===null||v===undefined||!isFinite(v)?'—':Number(v).toFixed(dec).replace('.',',');
   const signed=v=>v===null||v===undefined||!isFinite(v)?'—':(v>0?'+':'')+fmt(v);
