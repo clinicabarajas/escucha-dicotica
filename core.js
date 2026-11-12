@@ -1,5 +1,5 @@
-import { TEST_LISTS } from './data.js?v=1.13';
-import { clinicalAge_ } from './report.js?v=1.13';
+import { TEST_LISTS } from './data.js?v=1.14';
+import { clinicalAge_ } from './report.js?v=1.14';
 
 export const MODES = ['Atención dividida','Atención focalizada - oído derecho','Atención focalizada - oído izquierdo'];
 

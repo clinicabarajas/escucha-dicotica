@@ -1,7 +1,7 @@
-import { TEST_LISTS } from './data.js?v=1.13';
-import { MODES, blankSession, calculate, calculateIntegrated, exampleSession, integratedReadiness } from './core.js?v=1.13';
-import { buildClinicalPdf_, buildIntegratedPdf_, clinicalNorm_ } from './report.js?v=1.13';
-import { APP_VERSION } from './version.js?v=1.13';
+import { paperColumns } from './data.js?v=1.14';
+import { MODES, blankSession, calculate, calculateIntegrated, exampleSession, integratedReadiness } from './core.js?v=1.14';
+import { buildClinicalPdf_, buildIntegratedPdf_, clinicalNorm_ } from './report.js?v=1.14';
+import { APP_VERSION } from './version.js?v=1.14';
 
 const $=id=>document.getElementById(id);
 document.querySelectorAll('[data-version]').forEach(el=>el.textContent=APP_VERSION);
@@ -39,16 +39,25 @@ function renderList(){
   for(const button of document.querySelectorAll('[data-list]'))button.setAttribute('aria-pressed',String(Number(button.dataset.list)===active));
   $('reportList').textContent='LISTA '+active;$('calculate').textContent='Calcular informe de Lista '+active+' →';updateInstruction();
   const root=$('items');root.replaceChildren();
-  const byItem=Map.groupBy?Map.groupBy(TEST_LISTS[active].map((row,index)=>({row,index})),x=>x.row[0]):TEST_LISTS[active].reduce((m,row,index)=>(m.has(row[0])||m.set(row[0],[]),m.get(row[0]).push({row,index}),m),new Map());
-  for(const [item,rows]of byItem){
-    const box=document.createElement('section');box.className='item';box.setAttribute('aria-label','Ítem '+item);
-    const header=document.createElement('div');header.className='item-heading';header.innerHTML=`<b>Ítem ${String(item).padStart(2,'0')}</b><span>${rows[0].row[1]} ${rows[0].row[1]===1?'par':'pares'}</span>`;box.append(header);
-    for(const [ear,earName]of ['OD','OI'].entries()){
-      const group=document.createElement('div');group.className='digit-ear '+(ear===1?'oi':'od');const label=document.createElement('span');label.textContent=earName;group.append(label);
-      for(const {row,index}of rows){const control=document.createElement('label');control.className='digit-control';const input=document.createElement('input');input.type='checkbox';input.checked=list.scores[index][ear];input.setAttribute('aria-label',`Ítem ${item}, ${earName}, posición ${row[2]}, dígito ${row[ear+3]}`);input.dataset.index=index;input.dataset.ear=ear;const digit=document.createElement('span');digit.textContent=row[ear+3];control.append(input,digit);group.append(control);}
-      box.append(group);
+  for(const [columnIndex,columnData]of paperColumns(active).entries()){
+    const column=document.createElement('div');column.className='score-column';column.setAttribute('aria-label',`Columna ${columnIndex+1}, ítems ${columnData.start} a ${columnData.end}`);
+    const columnHeader=document.createElement('div');columnHeader.className='score-column-header';columnHeader.innerHTML='<span>Ítem</span><span class="od-key">OD</span><span class="oi-key">OI</span>';column.append(columnHeader);
+    for(const {item,rows}of columnData.items){
+      const box=document.createElement('section');box.className='score-item';box.setAttribute('aria-label','Ítem '+item);
+      const meta=document.createElement('div');meta.className='score-item-meta';meta.innerHTML=`<b>${String(item).padStart(2,'0')}</b><span>${rows[0].row[1]} ${rows[0].row[1]===1?'par':'pares'}</span>`;box.append(meta);
+      const rowStack=document.createElement('div');rowStack.className='score-row-stack';
+      for(const {row,index}of rows){
+        const scoreRow=document.createElement('div');scoreRow.className='score-row';
+        for(const [ear,earName]of ['OD','OI'].entries()){
+          const control=document.createElement('label');control.className='score-digit '+(ear===1?'oi':'od');
+          const input=document.createElement('input');input.type='checkbox';input.checked=list.scores[index][ear];input.setAttribute('aria-label',`Ítem ${item}, ${earName}, posición ${row[2]}, dígito ${row[ear+3]}`);input.dataset.index=index;input.dataset.ear=ear;
+          const digit=document.createElement('span');digit.textContent=row[ear+3];control.append(input,digit);scoreRow.append(control);
+        }
+        rowStack.append(scoreRow);
+      }
+      box.append(rowStack);column.append(box);
     }
-    root.append(box);
+    root.append(column);
   }
   setStatus(list.complete?'Informe calculado. Puedes abrirlo o descargarlo.':'Revisa los 27 ítems antes de calcular.');refreshResults();
 }

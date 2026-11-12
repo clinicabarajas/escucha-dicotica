@@ -1,4 +1,4 @@
-# Escucha dicótica · Clínica Barajas · V1.13
+# Escucha dicótica · Clínica Barajas · V1.14
 
 Plantilla web del Test de Dígitos Dicóticos (TDD). Introduce las respuestas de cualquiera de las tres listas y descarga informes PDF A4 verticales. Permite generar cada informe con identidad de Clínica Barajas o en formato neutro, sin logo ni mención institucional.
 
@@ -7,7 +7,7 @@ Plantilla web del Test de Dígitos Dicóticos (TDD). Introduce las respuestas de
 ## Uso
 
 1. Introduce los datos de la evaluación; la identificación es opcional.
-2. Selecciona una lista y su modalidad. Marca los dígitos reconocidos. En atención focalizada, las marcas del oído no atendido son intrusiones.
+2. Selecciona una lista y su modalidad. Marca los dígitos reconocidos siguiendo las columnas verticales del cuadernillo: de arriba abajo y después en la columna siguiente. En atención focalizada, las marcas del oído no atendido son intrusiones.
 3. Pulsa **Calcular informe** y confirma que has revisado los 27 ítems. Los dígitos sin marcar cuentan como 0.
 4. Abre o descarga el PDF. Cada lista produce su propio informe; no es necesario realizar las tres.
 5. Al completar las tres modalidades previstas se activa el **Informe 04**, que integra línea base, facilitación, supresión de intrusiones, asimetría y efecto de carga.
@@ -54,6 +54,13 @@ Pruebas sin dependencias: `node --test core.test.js` (Node 20 o posterior). Veri
 El logotipo pertenece a Clínica Barajas. La referencia bibliográfica se conserva en la web y en cada informe. Si se activa el formato neutro, el PDF no incorpora el logo ni menciones institucionales.
 
 La ilustración de cerebro y oídos del Informe 04 fue aportada expresamente para este proyecto y se integra en el PDF sin conexiones externas.
+
+## V1.14
+
+- Rediseñada la entrada de respuestas para reproducir la lectura vertical de los cuadernillos impresos.
+- Cada ítem muestra OD y OI en columnas paralelas y los dígitos avanzan de arriba abajo.
+- Se mantienen los cortes de columna propios de cada plantilla: Lista 1 (1–10, 11–20, 21–27), Lista 2 (1–10, 11–21, 22–27) y Lista 3 (1–11, 12–21, 22–27).
+- El orden interno de los 81 estímulos por oído y todos los cálculos permanecen sin cambios.
 
 ## V1.13
 

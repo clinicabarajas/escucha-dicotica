@@ -1,4 +1,11 @@
 // Plantillas de estímulos, sin puntuaciones ni datos de participantes.
+// Los cortes reproducen la distribución vertical de los cuadernillos impresos.
+export const PAPER_COLUMN_RANGES = Object.freeze({
+  1: Object.freeze([[1,10],[11,20],[21,27]]),
+  2: Object.freeze([[1,10],[11,21],[22,27]]),
+  3: Object.freeze([[1,11],[12,21],[22,27]])
+});
+
 export const TEST_LISTS = {
   "1": [
     [
@@ -1708,3 +1715,22 @@ export const TEST_LISTS = {
     ]
   ]
 };
+
+export function paperColumns(listNumber){
+  const rows=TEST_LISTS[listNumber];
+  const ranges=PAPER_COLUMN_RANGES[listNumber];
+  if(!rows||!ranges)throw new Error('Lista no disponible.');
+  const grouped=new Map();
+  rows.forEach((row,index)=>{
+    if(!grouped.has(row[0]))grouped.set(row[0],[]);
+    grouped.get(row[0]).push({row,index});
+  });
+  return ranges.map(([start,end])=>({
+    start,
+    end,
+    items:Array.from({length:end-start+1},(_,offset)=>{
+      const item=start+offset;
+      return {item,rows:grouped.get(item)||[]};
+    })
+  }));
+}
